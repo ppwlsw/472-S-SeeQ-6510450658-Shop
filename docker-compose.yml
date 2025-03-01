@@ -1,0 +1,25 @@
+services:
+  remix-app:
+    image: oven/bun:1.2.3
+    ports:
+      - "3001:5173"
+    volumes:
+      - type: bind
+        source: .
+        target: /app
+        consistency: delegated
+    working_dir: /app
+    tty: true
+    stdin_open: true
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+    command: sh -c "bun install && exec bun run dev --host"
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./app/*
+          target: /app/*
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: ./package.json
