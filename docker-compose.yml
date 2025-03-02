@@ -23,3 +23,10 @@ services:
             - node_modules/
         - action: rebuild
           path: ./package.json
+    networks:
+      - newton
+      
+networks:
+  newton:
+    external: true
+    name: seeq-backend_sail
