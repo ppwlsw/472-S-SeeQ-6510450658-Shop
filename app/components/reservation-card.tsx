@@ -12,30 +12,23 @@ interface ReservationCardProps {
 }
 
 function ReservationCard({
-  reservation,
-}: {
-  reservation: ReservationCardProps;
-}) {
-  // Destructure reservation data with defaults
-  const {
-    name = "Preshit Pimple",
-    time = "10:30AM",
-    date = "Today",
-    table = "Table A",
-    capacity = "6-8 Persons",
-    status = "Completed",
-    phone = "088-888-8888",
-  } = reservation || {};
-
+  name,
+  time,
+  date,
+  table,
+  capacity,
+  status,
+  phone,
+}: ReservationCardProps) {
   // Status styling logic
   const getStatusStyles = (status: string) => {
     switch (status) {
       case "Completed":
         return "bg-[#DAFFD9] text-[#33D117]";
-      case "Waiting":
+      case "Pending":
         return "bg-[#FFE9D9] text-[#FF8A00]";
-      case "Seated":
-        return "bg-[#D9EAFF] text-[#2D60FF]";
+      case "Canceled":
+        return "bg-[#FFD9D9] text-[#D11717]";
       default:
         return "bg-[#DAFFD9] text-[#33D117]";
     }
