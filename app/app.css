@@ -1,8 +1,17 @@
 @import "tailwindcss";
+@import "./components/wave.css";
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --drop-shadow-3xl: 0 10px 35px rgba(0, 0, 0, 0.30); 
+  --color-main-blue: #3A57E8;
+  --color-nature-blue: #79E0EE;
+  --color-nature-mint: #98EECC;
+  --color-nature-sage: #D0F5BE;
+  --color-nature-yellow: #FBFFDC;
+  --color-white-smoke: #F5F5F5;
+  --color-obsidian: #0B1215;
 }
 
 html,
