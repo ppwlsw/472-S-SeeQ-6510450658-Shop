@@ -40,7 +40,7 @@ export async function action({ request }: ActionFunctionArgs) {
     const token: string = response.data.token;
     const decrypted = (await requestDecryptToken(token)).data;
     const cookie = await authCookie.serialize(decrypted);
-    return redirect("/dashboard/user", {
+    return redirect("/home", {
       headers: {
         "Set-Cookie": cookie,
       },

@@ -25,7 +25,6 @@ export async function requestLogin(
     method: "POST",
     body: formData,
   });
-  console.log(response);
 
   const json = await response.json();
    return {
