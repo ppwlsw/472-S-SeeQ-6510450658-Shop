@@ -14,6 +14,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { useNavigate } from "react-router";
 
 function DashboardPage() {
   // Mock Data for Stats
@@ -98,6 +99,12 @@ function DashboardPage() {
     { name: "Sat", count: 23 },
   ];
 
+  const navigate = useNavigate();
+
+  const handleViewAllQueueButton = () => {
+    navigate("/merchant/queue-manage");
+  };
+
   return (
     <div className="flex flex-col gap-8 p-6 bg-gray-50 min-h-screen">
       {/* Stats Section */}
@@ -117,11 +124,14 @@ function DashboardPage() {
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="flex items-center justify-between p-6 border-b border-gray-100">
             <h2 className="text-2xl font-semibold text-gray-800">All Queues</h2>
-            <button className="text-blue-600 hover:text-blue-800 font-medium transition-colors">
+            <button
+              className="text-blue-600 hover:text-blue-800 font-medium transition-colors cursor-pointer"
+              onClick={handleViewAllQueueButton}
+            >
               View All
             </button>
           </div>
-          <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+          <div className="p-6 space-y-4 max-h-[65vh] overflow-y-auto">
             {reservations.map((res) => (
               <ReservationCard key={res.id} {...res} />
             ))}
@@ -155,7 +165,7 @@ function DashboardPage() {
           </div>
 
           {/* Chart Section */}
-          <div className="bg-white rounded-xl shadow-lg p-6 h-96">
+          <div className="bg-white rounded-xl shadow-lg p-6 h-[45 vh]">
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">
               Queue Chart
             </h2>

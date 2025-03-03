@@ -11,6 +11,7 @@ import {
   FileText,
 } from "lucide-react";
 import { useFetcher, type ActionFunctionArgs } from "react-router";
+import ChangePasswordModal from "~/components/change-password";
 
 interface UpdateShopRequest {
   name: string;
@@ -67,6 +68,7 @@ function StoreManagePage() {
   const [queueOpen, setQueueOpen] = useState(true);
   const [storeImage, setStoreImage] = useState("/starbuck.png");
   const [isEditing, setIsEditing] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setStoreName(e.target.value);
@@ -106,6 +108,10 @@ function StoreManagePage() {
 
   return (
     <div className="flex flex-col gap-5 items-center p-6">
+      <ChangePasswordModal 
+        isOpen={isPasswordModalOpen}
+        onClose={() => setIsPasswordModalOpen(false)}
+      />
       <div className="flex justify-end space-x-9 items-center w-full">
         <fetcher.Form method="PUT" className="flex items-center gap-4">
           <span className="font-medium flex items-center gap-2">
@@ -165,6 +171,7 @@ function StoreManagePage() {
           <div className="flex justify-center gap-4 mb-4">
             <button
               type="button"
+              onClick={() => setIsPasswordModalOpen(true)}
               className="px-4 py-2 rounded-lg bg-blue-800 hover:bg-blue-900 text-white flex items-center gap-2 cursor-pointer"
             >
               <Lock size={18} />
