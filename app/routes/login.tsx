@@ -185,7 +185,7 @@ export default function Login() {
               ร้านค้า
             </span>
             <div className="pt-4 border-white-smoke">
-              <Store size={36}/>
+              <Store size={36} />
             </div>
           </p>
           <div className="w-full mt-8">
