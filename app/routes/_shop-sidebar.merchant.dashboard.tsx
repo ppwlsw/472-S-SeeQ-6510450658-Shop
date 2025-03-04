@@ -2,10 +2,10 @@ import ReservationCard from "~/components/reservation-card";
 import StatCard from "~/components/stat-card";
 import ReminderCard from "~/components/reminder-card";
 import { CalendarCheck, Clock, Users, XCircle } from "lucide-react";
+import { useNavigate } from "react-router";
 
 import {
   BarChart,
-  Legend,
   Bar,
   Rectangle,
   XAxis,
@@ -14,7 +14,6 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { useNavigate } from "react-router";
 
 function DashboardPage() {
   // Mock Data for Stats
@@ -165,7 +164,7 @@ function DashboardPage() {
           </div>
 
           {/* Chart Section */}
-          <div className="bg-white rounded-xl shadow-lg p-6 h-[45 vh]">
+          <div className="bg-white rounded-xl shadow-lg p-6 h-[45vh]">
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">
               Queue Chart
             </h2>
