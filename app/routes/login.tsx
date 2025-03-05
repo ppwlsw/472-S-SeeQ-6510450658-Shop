@@ -38,7 +38,7 @@ export async function action({ request }: ActionFunctionArgs) {
     }
 
     const token: string = response.data.token;
-    const user_id: string = response.data.user_id;
+    const user_id: string = response.data.id;
     const role: string = response.data.role;
 
     const decrypted = (await requestDecryptToken(token)).data;
