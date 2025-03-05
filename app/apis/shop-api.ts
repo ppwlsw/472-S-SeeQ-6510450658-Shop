@@ -11,7 +11,6 @@ export async function fetchingShopData(user_id : number, token : string) {
           throw redirect("/login");
         }    
         const shop = await response.json();
-        console.log("SHOP : ", shop);
     
         if (!shop) {
           throw redirect("/login");

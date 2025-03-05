@@ -5,19 +5,19 @@ import { SidebarItem } from "~/components/sidebar-item";
 import { redirect, useLoaderData, type LoaderFunctionArgs } from "react-router";
 
 import { shop_provider } from "~/provider/provider";
-import { getCookie } from "~/apis/cookie-api";
 import { fetchingShopData } from "~/apis/shop-api";
+import { getAuthCookie } from "~/services/cookie";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const data = await getCookie(request);
+  const data = await getAuthCookie({ request });
   const user_id = data.user_id;
-  const token = data.token.plain_text;
+  const token = data.token;
   const role = data.role;
-  
+
   if (role !== "SHOP") {
     return redirect("/login");
   }
-  
+
   try {
     await fetchingShopData(user_id, token);
   } catch (error) {
@@ -43,7 +43,6 @@ const MerchantNav = () => {
   };
 
   const { shop } = useLoaderData<typeof loader>();
-
 
   return (
     <div className="flex flex-row h-screen">
