@@ -12,3 +12,14 @@ export const authCookie: Cookie = createCookie("auth", {
   secure: ENV === "PRODUCTION",
   secrets: [BACKEND_URL]
 });
+
+export interface AuthCookieProps {
+  token: string;
+  user_id: number;
+  role: string;
+}
+
+export async function getAuthCookie({request} : {request: Request}): Promise<AuthCookieProps> {
+  const cookie : AuthCookieProps = await authCookie.parse(request.headers.get("Cookie"));
+  return cookie;
+}

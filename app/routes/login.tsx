@@ -3,7 +3,7 @@ import { useState } from "react";
 import { redirect, useFetcher, type ActionFunctionArgs } from "react-router";
 import Wave from "~/components/wave";
 import { requestDecryptToken, requestLogin } from "~/services/auth";
-import { authCookie } from "~/services/cookie";
+import { authCookie, type AuthCookieProps } from "~/services/cookie";
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
@@ -38,15 +38,15 @@ export async function action({ request }: ActionFunctionArgs) {
     }
 
     const token: string = response.data.token;
-    const user_id: string = response.data.id;
+    const user_id: number = response.data.id;
     const role: string = response.data.role;
 
-    const decrypted = (await requestDecryptToken(token)).data;
+    const decrypted = (await requestDecryptToken(token)).data.plain_text as string;
     const cookie = await authCookie.serialize({
       token: decrypted,
       user_id: user_id,
       role: role,
-    });
+    } as AuthCookieProps);
 
     return redirect("/merchant/dashboard", {
       headers: {
