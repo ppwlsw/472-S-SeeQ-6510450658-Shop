@@ -13,11 +13,9 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useLoaderData, useNavigate } from "react-router";
-
 import { redirect, type LoaderFunctionArgs } from "react-router";
-
 import { authCookie } from "~/services/cookie";
-import { setShopProvider, shop_provider } from "~/provider/provider";
+import { shop_provider } from "~/provider/provider";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const cookie = request.headers.get("cookie");

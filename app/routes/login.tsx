@@ -48,7 +48,7 @@ export async function action({ request }: ActionFunctionArgs) {
       role: role,
     });
 
-    return redirect("/home", {
+    return redirect("/merchant/dashboard", {
       headers: {
         "Set-Cookie": cookie,
       },

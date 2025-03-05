@@ -2,47 +2,24 @@ import { Outlet, Link, useLocation } from "react-router";
 import { ChartSpline, UsersRound, Pencil, Bell, Store } from "lucide-react";
 import { SidebarItem } from "~/components/sidebar-item";
 
-import {
-  redirect,
-  useLoaderData,
-  useNavigate,
-  type LoaderFunctionArgs,
-} from "react-router";
+import { redirect, useLoaderData, type LoaderFunctionArgs } from "react-router";
 
-import { authCookie } from "~/services/cookie";
-import { setShopProvider, shop_provider } from "~/provider/provider";
+import { shop_provider } from "~/provider/provider";
+import { getCookie } from "~/apis/cookie-api";
+import { fetchingShopData } from "~/apis/shop-api";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const cookie = request.headers.get("cookie");
-  const data = await authCookie.parse(cookie);
-  if (!data) {
-    return redirect("/login");
-  }
+  const data = await getCookie(request);
   const user_id = data.user_id;
   const token = data.token.plain_text;
   const role = data.role;
-
+  
   if (role !== "SHOP") {
     return redirect("/login");
   }
-
+  
   try {
-    const response = await fetch(
-      `${process.env.BACKEND_URL}/users/${user_id}/shop`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    if (!response.ok) {
-      return redirect("/login");
-    }
-
-    const shop = await response.json();
-
-    if (!shop) {
-      return redirect("/login");
-    }
-
-    setShopProvider(user_id, shop.data);
+    await fetchingShopData(user_id, token);
   } catch (error) {
     console.error(error);
   }
@@ -66,6 +43,7 @@ const MerchantNav = () => {
   };
 
   const { shop } = useLoaderData<typeof loader>();
+
 
   return (
     <div className="flex flex-row h-screen">
@@ -125,7 +103,7 @@ const MerchantNav = () => {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center border-[1px] overflow-hidden">
-                {shop.image_uri ? (
+                {shop.image_uri !== undefined ? (
                   <img
                     src={shop.image_uri}
                     className="object-cover w-full h-full "

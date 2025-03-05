@@ -20,6 +20,7 @@ let shop_provider: Record<number,Shop> = {} ;
 
 function setShopProvider(user_id: number,  shop : Shop) {
   shop_provider[user_id] = shop;
+  console.log("SHOP PROVIDER : ", shop_provider);
 }
 
 
