@@ -2,8 +2,6 @@ import ReservationCard from "~/components/reservation-card";
 import StatCard from "~/components/stat-card";
 import ReminderCard from "~/components/reminder-card";
 import { CalendarCheck, Clock, Users, XCircle } from "lucide-react";
-import { useNavigate } from "react-router";
-
 import {
   BarChart,
   Bar,
@@ -14,6 +12,23 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { useLoaderData, useNavigate } from "react-router";
+import { redirect, type LoaderFunctionArgs } from "react-router";
+import { authCookie } from "~/services/cookie";
+import { shop_provider } from "~/provider/provider";
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const cookie = request.headers.get("cookie");
+  const data = await authCookie.parse(cookie);
+
+  if (!data) {
+    return redirect("/login");
+  }
+
+  const user_id = data.user_id;
+
+  return { shop: shop_provider[user_id] };
+}
 
 function DashboardPage() {
   // Mock Data for Stats
@@ -103,6 +118,8 @@ function DashboardPage() {
   const handleViewAllQueueButton = () => {
     navigate("/merchant/queue-manage");
   };
+
+  const { shop } = useLoaderData<typeof loader>();
 
   return (
     <div className="flex flex-col gap-8 p-6 bg-gray-50 min-h-screen">

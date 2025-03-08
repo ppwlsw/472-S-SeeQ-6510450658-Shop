@@ -1,6 +1,31 @@
 import { Outlet, Link, useLocation } from "react-router";
-import { ChartSpline, UsersRound, Pencil, Bell } from "lucide-react";
+import { ChartSpline, UsersRound, Pencil, Bell, Store } from "lucide-react";
 import { SidebarItem } from "~/components/sidebar-item";
+
+import { redirect, useLoaderData, type LoaderFunctionArgs } from "react-router";
+
+import { shop_provider } from "~/provider/provider";
+import { fetchingShopData } from "~/apis/shop-api";
+import { getAuthCookie } from "~/services/cookie";
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const data = await getAuthCookie({ request });
+  const user_id = data.user_id;
+  const token = data.token;
+  const role = data.role;
+
+  if (role !== "SHOP") {
+    return redirect("/login");
+  }
+
+  try {
+    await fetchingShopData(user_id, token);
+  } catch (error) {
+    console.error(error);
+  }
+
+  return { shop: shop_provider[user_id] };
+}
 
 const MerchantNav = () => {
   const location = useLocation();
@@ -16,6 +41,8 @@ const MerchantNav = () => {
       return "ภาพรวมร้านค้า";
     }
   };
+
+  const { shop } = useLoaderData<typeof loader>();
 
   return (
     <div className="flex flex-row h-screen">
@@ -75,15 +102,20 @@ const MerchantNav = () => {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center border-[1px] overflow-hidden">
-                <img
-                  src="/teenoi.png"
-                  className="object-cover w-full h-full "
-                />
+                {shop.image_uri !== undefined ? (
+                  <img
+                    src={shop.image_uri}
+                    className="object-cover w-full h-full "
+                  />
+                ) : (
+                  <img
+                    src="/default_img.jpg"
+                    className="object-cover w-full h-full "
+                  />
+                )}
               </div>
               <div className="flex flex-col">
-                <span className="text-sm font-medium">
-                  สุกี้ตี๋น้อย สาขาพหลโยธิน 19
-                </span>
+                <span className="text-sm font-medium">{shop.name}</span>
               </div>
             </div>
           </div>
