@@ -4,6 +4,7 @@ import { redirect, useFetcher, type ActionFunctionArgs } from "react-router";
 import Wave from "~/components/wave";
 import { requestDecryptToken, requestLogin } from "~/services/auth";
 import { authCookie, type AuthCookieProps } from "~/services/cookie";
+import { motion } from "framer-motion";
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
@@ -136,11 +137,13 @@ interface ActionMessage {
 }
 
 function LoginFetcherForm() {
-  const fetcher = useFetcher<ActionMessage>();
+  const fetcher = useFetcher({
+    key: "LoginFetcher",
+  });
   return (
     <fetcher.Form
       method="POST"
-      className="flex flex-col justify-start items-center w-full text-lg"
+      className="flex flex-col justify-start items-center w-full"
     >
       <div className="flex flex-col justify-evenly items-center w-full gap-12">
         <InputForm name="email" type="text" label="อีเมล" placeholder="อีเมล" />
@@ -156,13 +159,15 @@ function LoginFetcherForm() {
           name="_action"
           value="default_login"
           type="submit"
-          className="bg-nature-blue text-white-smoke text-2xl font-bold p-6 rounded-full w-full"
+          className="bg-nature-blue text-2xl text-white-smoke font-bold p-6 rounded-full w-full"
         >
           เข้าสู่ระบบ
         </button>
         <p
           className={`w-full text-red-500 text-center border border-red-500 bg-red-100 p-1 rounded-md ${
-            fetcher.data?.error ? "opacity-100" : "opacity-0"
+            fetcher.data?.error && fetcher.state === "idle"
+              ? "opacity-100"
+              : "opacity-0"
           }`}
         >
           {fetcher.data?.error ? fetcher.data.error : "error"}
@@ -172,35 +177,60 @@ function LoginFetcherForm() {
   );
 }
 
-export default function Login() {
+function LoadingModal({state}: {state: string}) {
   return (
-    <div className="flex flex-col h-svh w-svw justify-start items-center bg-white-smoke text-obsidian p-20 pt-0 overflow-hidden">
-      <Wave />
-      <div className="h-fit">
-        <img src="/seeq-logo.png" alt="seeq-logo" className="h-48" />
+    <motion.div
+      initial={{ opacity: 0, display: "none" }}
+      animate={{
+        opacity: 1,
+        display: state === "submitting" ? "flex" : "none",
+        transition: { duration: 1,  ease: "easeIn"},
+      }}
+      className="flex flex-col justify-center items-center absolute w-full h-full z-50 text-obsidian"
+    >
+      <div className="relative w-full h-full bg-obsidian opacity-25"></div>
+      <div className="flex flex-col justify-center items-center gap-3 absolute rounded-lg shadow-lg bg-white-smoke p-6">
+        <p className="text-xl text-obsidian">เข้าสู่ระบบ...</p>
+        <span className="inline-block w-[20px] h-[20px] border-4 border-gray-400 rounded-full border-t-white-smoke animate-spin"></span>
       </div>
+    </motion.div>
+  );
+}
 
-      <div className="flex flex-row bg-white-smoke w-full drop-shadow-3xl rounded-lg p-3 pt-20 pb-20">
-        <div className="flex justify-center items-center w-full border-r-[0.1px] border-gray-300">
-          <img src="/login-shop-logo.png" alt="admin-logo" className="w-2/3" />
-        </div>
-        <div className="flex flex-col justify-center w-full border-l-[0.1px] border-gray-300 pl-28 pr-28">
-          <p className="flex flex-row  items-center text-4xl mb-6 gap-3">
-            <span className="inline-flex border-t-4 pt-4 border-nature-blue">
-              เข้าสู่ระบบ
-            </span>
-            <span className="inline-flex border-t-4 pt-4 border-white-smoke">
-              ร้านค้า
-            </span>
-            <div className="pt-4 border-white-smoke">
-              <Store size={36} />
+export default function Login() {
+  const fetcher = useFetcher<ActionMessage>({
+    key: "LoginFetcher",
+  });
+  return (
+    <div className="flex flex-col h-svh w-svw bg-white-smoke relative overflow-hidden">
+      {/* Main content */}
+      <div className="flex flex-col h-full w-full justify-center items-center text-obsidian p-20 z-10">
+
+        <div className="flex flex-row bg-white-smoke w-full h-full drop-shadow-3xl rounded-lg p-10">
+          <div className="flex flex-col justify-center items-center w-full border-r-[0.1px] border-gray-300">
+            <img src="/seeq-logo.png" alt="seeq-logo" className="w-[10svw]"/>
+            <img src="/shop-logo.png" alt="admin-logo" className="-mt-10 inline w-[30svw]" />
+          </div>
+          <div className="flex flex-col justify-center w-full h-full border-l-[0.1px] border-gray-300 p-10">
+            <p className="flex flex-row items-center text-4xl mb-6">
+                เข้าสู่ระบบร้านค้า
+                <Store size={36} />
+            </p>
+            <div className="w-full mt-8">
+              <LoginFetcherForm />
             </div>
-          </p>
-          <div className="w-full mt-8">
-            <LoginFetcherForm />
           </div>
         </div>
+
       </div>
+
+      {/* Wave at the bottom */}
+      <div className="absolute bottom-0 left-0 w-full">
+        <Wave />
+      </div>
+
+      {/* Loading */}
+      <LoadingModal state={fetcher.state}/>
     </div>
   );
 }
