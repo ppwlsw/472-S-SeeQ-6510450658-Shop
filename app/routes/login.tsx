@@ -190,7 +190,7 @@ function LoadingModal({state}: {state: string}) {
     >
       <div className="relative w-full h-full bg-obsidian opacity-25"></div>
       <div className="flex flex-col justify-center items-center gap-3 absolute rounded-lg shadow-lg bg-white-smoke p-6">
-        <p className="text-xl text-obsidian">เข้าสู่ระบบ...</p>
+        <p className="text-xl text-obsidian">กำลังโหลด...</p>
         <span className="inline-block w-[20px] h-[20px] border-4 border-gray-400 rounded-full border-t-white-smoke animate-spin"></span>
       </div>
     </motion.div>
