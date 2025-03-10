@@ -145,7 +145,7 @@ function LoginFetcherForm() {
       method="POST"
       className="flex flex-col justify-start items-center w-full"
     >
-      <div className="flex flex-col justify-evenly items-center w-full gap-12">
+      <div className="flex flex-col justify-evenly items-center w-full gap-8">
         <InputForm name="email" type="text" label="อีเมล" placeholder="อีเมล" />
 
         <InputForm
@@ -159,7 +159,7 @@ function LoginFetcherForm() {
           name="_action"
           value="default_login"
           type="submit"
-          className="bg-nature-blue text-2xl text-white-smoke font-bold p-6 rounded-full w-full"
+          className="bg-nature-blue text-white-smoke border-2 text-2xl font-bold p-6 rounded-full w-full transition-all duration-300 hover:bg-white-smoke hover:text-nature-blue hover:border-2 hover:border-nature-blue hover:cursor-pointer"
         >
           เข้าสู่ระบบ
         </button>
@@ -177,14 +177,14 @@ function LoginFetcherForm() {
   );
 }
 
-function LoadingModal({state}: {state: string}) {
+function LoadingModal({ state }: { state: string }) {
   return (
     <motion.div
       initial={{ opacity: 0, display: "none" }}
       animate={{
         opacity: 1,
         display: state === "submitting" ? "flex" : "none",
-        transition: { duration: 1,  ease: "easeIn"},
+        transition: { duration: 1, ease: "easeIn" },
       }}
       className="flex flex-col justify-center items-center absolute w-full h-full z-50 text-obsidian"
     >
@@ -205,23 +205,27 @@ export default function Login() {
     <div className="flex flex-col h-svh w-svw bg-white-smoke relative overflow-hidden">
       {/* Main content */}
       <div className="flex flex-col h-full w-full justify-center items-center text-obsidian p-20 z-10">
-
-        <div className="flex flex-row bg-white-smoke w-full h-full drop-shadow-3xl rounded-lg p-10">
-          <div className="flex flex-col justify-center items-center w-full border-r-[0.1px] border-gray-300">
-            <img src="/seeq-logo.png" alt="seeq-logo" className="w-[10svw]"/>
-            <img src="/shop-logo.png" alt="admin-logo" className="-mt-10 inline w-[30svw]" />
+        <div className="flex max-lg:flex-col flex-row bg-white-smoke w-full h-full drop-shadow-3xl rounded-lg p-10">
+          <div className="flex flex-col justify-center items-center max-lg:h-2/5 w-full lg:border-r-[0.1px] border-gray-300">
+            <img
+              src="/shop-logo.png"
+              alt="shop-logo"
+              className="h-full object-contain"
+            />
           </div>
-          <div className="flex flex-col justify-center w-full h-full border-l-[0.1px] border-gray-300 p-10">
-            <p className="flex flex-row items-center text-4xl mb-6">
-                เข้าสู่ระบบร้านค้า
+          <div className="flex flex-col justify-center max-lg:h-3/5 w-full lg:border-l-[0.1px] border-gray-300 p-10 pt-0 pb-0 lg:gap-8">
+            <p className="flex flex-row items-center text-4xl">
+              <span className="border-t-4 border-nature-blue pt-2">เข้าสู่ระบบ</span>
+              <span className="border-t-4 border-white-smoke pt-2">ร้านค้า</span>
+              <div className="border-t-4 border-white-smoke pt-2">
                 <Store size={36} />
+              </div> 
             </p>
             <div className="w-full mt-8">
               <LoginFetcherForm />
             </div>
           </div>
         </div>
-
       </div>
 
       {/* Wave at the bottom */}
@@ -230,7 +234,8 @@ export default function Login() {
       </div>
 
       {/* Loading */}
-      <LoadingModal state={fetcher.state}/>
+
+      <LoadingModal state={fetcher.state} />
     </div>
   );
 }
