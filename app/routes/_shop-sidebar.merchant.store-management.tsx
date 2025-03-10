@@ -20,6 +20,7 @@ import ChangePasswordModal from "~/components/change-password";
 import { shop_provider } from "~/provider/provider";
 import { authCookie } from "~/services/cookie";
 import { changeShopOpenStatus } from "~/apis/shop-api";
+import Swal from "sweetalert2";
 
 interface UpdateShopRequest {
   name: string;
@@ -127,6 +128,36 @@ function StoreManagePage() {
     setIsEditing((prev) => !prev);
   };
 
+  const handleStoreStatusChange = (e: any) => {
+    e.preventDefault(); // Prevent default form submission
+
+    Swal.fire({
+      title: shop.is_open ? "Close Store?" : "Open Store?",
+      text: shop.is_open
+        ? "Are you sure you want to close your store?"
+        : "Are you sure you want to open your store?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: shop.is_open ? "#d33" : "#08db0f",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: shop.is_open ? "Yes, close it!" : "Yes, open it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Submit the form programmatically
+        fetcher.submit({ _action: "storeStatus" }, { method: "PUT" });
+
+        // Optional: Show success message after submission
+        Swal.fire(
+          "Success!",
+          shop.is_open
+            ? "Your store has been closed."
+            : "Your store is now open.",
+          "success"
+        );
+      }
+    });
+  };
+
   return (
     <div className="flex flex-col gap-5 items-center p-6">
       <ChangePasswordModal
@@ -145,6 +176,7 @@ function StoreManagePage() {
           </span>
           <button
             type="submit"
+            onClick={handleStoreStatusChange}
             name="_action"
             value="storeStatus"
             className={`px-4 py-2 rounded-lg text-white cursor-pointer ${
