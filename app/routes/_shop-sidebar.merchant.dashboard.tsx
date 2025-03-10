@@ -15,7 +15,8 @@ import {
 import { useLoaderData, useNavigate } from "react-router";
 import { redirect, type LoaderFunctionArgs } from "react-router";
 import { authCookie } from "~/services/cookie";
-import { shop_provider } from "~/provider/provider";
+import { reminder_provider, shop_provider } from "~/provider/provider";
+import { fetchingShopReminders } from "~/apis/shop-api";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const cookie = request.headers.get("cookie");
@@ -26,8 +27,18 @@ export async function loader({ request }: LoaderFunctionArgs) {
   }
 
   const user_id = data.user_id;
+  const shop_id = shop_provider[user_id].id;
 
-  return { shop: shop_provider[user_id] };
+  try {
+    await fetchingShopReminders(shop_id, request);
+  } catch (e) {
+    console.error("Error fetching shop ", e);
+  }
+
+  return {
+    shop: shop_provider[user_id],
+    reminders: reminder_provider[shop_id],
+  };
 }
 
 function DashboardPage() {
@@ -82,26 +93,7 @@ function DashboardPage() {
       phone: "111-222-3333",
     },
   ];
-
-  // Mock Data for Reminders
-  const reminders = [
-    {
-      title: "Confirm customer arrival",
-      time: "10:30 AM",
-      description: "Call Mr. John Doe to confirm his reservation at Table 5.",
-    },
-    {
-      title: "Prepare VIP table",
-      time: "12:00 PM",
-      description: "Ensure Table 1 is set with premium utensils and wine.",
-    },
-    {
-      title: "Staff Meeting",
-      time: "4:00 PM",
-      description: "Discuss new customer service guidelines for the weekend.",
-    },
-  ];
-
+ 
   // Mock Data for Chart
   const data = [
     { name: "Sun", count: 10 },
@@ -120,6 +112,7 @@ function DashboardPage() {
   };
 
   const { shop } = useLoaderData<typeof loader>();
+  const { reminders } = useLoaderData();
 
   return (
     <div className="flex flex-col gap-8 p-6 bg-gray-50 min-h-screen">
@@ -168,14 +161,26 @@ function DashboardPage() {
             </div>
             <div className="p-6 overflow-x-auto">
               <div className="flex gap-4">
-                {reminders.map((reminder, index) => (
-                  <ReminderCard
-                    key={index}
-                    title={reminder.title}
-                    time={reminder.time}
-                    description={reminder.description}
-                  />
-                ))}
+                {reminders.map((reminder: any, index: number) => {
+                  return (
+                    <ReminderCard
+                      key={reminder.id}
+                      title={reminder.title}
+                      time={new Date(reminder.due_date).toLocaleString(
+                        "th-TH",
+                        {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          second: "2-digit",
+                        }
+                      )}
+                      description={reminder.description}
+                    />
+                  );
+                })}
               </div>
             </div>
           </div>
