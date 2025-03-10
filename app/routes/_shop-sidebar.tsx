@@ -11,7 +11,6 @@ import { getAuthCookie } from "~/services/cookie";
 export async function loader({ request }: LoaderFunctionArgs) {
   const data = await getAuthCookie({ request });
   const user_id = data.user_id;
-  const token = data.token;
   const role = data.role;
 
   if (role !== "SHOP") {
@@ -19,7 +18,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   }
 
   try {
-    await fetchingShopData(user_id, token);
+    await fetchingShopData(user_id, request);
   } catch (error) {
     console.error(error);
   }

@@ -10,8 +10,17 @@ import {
   MapPin,
   FileText,
 } from "lucide-react";
-import { useFetcher, type ActionFunctionArgs } from "react-router";
+import {
+  redirect,
+  useFetcher,
+  useLoaderData,
+  type ActionFunctionArgs,
+} from "react-router";
 import ChangePasswordModal from "~/components/change-password";
+import { shop_provider } from "~/provider/provider";
+import { authCookie } from "~/services/cookie";
+import { changeShopOpenStatus } from "~/apis/shop-api";
+import Swal from "sweetalert2";
 
 interface UpdateShopRequest {
   name: string;
@@ -20,30 +29,49 @@ interface UpdateShopRequest {
   description: string;
 }
 
+export async function loader({ request }: ActionFunctionArgs) {
+  const cookie = request.headers.get("cookie");
+  const data = await authCookie.parse(cookie);
+
+  if (!data) {
+    return redirect("/login");
+  }
+
+  const user_id = data.user_id;
+  const shop = shop_provider[user_id];
+
+  if (!shop) {
+    return redirect("/create-shop");
+  }
+
+  return { user_id, shop };
+}
+
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const action = formData.get("_action");
+  const cookie = request.headers.get("cookie");
+  const data = await authCookie.parse(cookie);
+
+  if (!data) {
+    return redirect("/login");
+  }
+  const user_id = data.user_id;
+  const shop_id = shop_provider[user_id].id;
+  const shop = shop_provider[user_id];
 
   switch (action) {
     case "storeStatus":
       console.log("Store status action");
-      // Update store status
-      //TODO : GET shop_id before update
-      const shop_id = 36;
-      const uri = `http://localhost:80/api/shops/36/is-open`;
-      const response = await fetch(uri, {
-        headers: {
-          Authorization: `Bearer ${process.env.SHOP_EXTERNAL_TOKEN}`,
-        },
-        method: "PUT",
-      });
-      const data = await response.json();
-      console.log(data);
+      try {
+        const response = await changeShopOpenStatus(shop_id, request);
+      } catch (error) {
+        console.error(error);
+      }
       break;
 
     case "updateShop":
       console.log("Update shop action");
-      // TODO: Implement shop update logic
       const updateData: UpdateShopRequest = {
         name: formData.get("name") as string,
         address: formData.get("address") as string,
@@ -51,9 +79,6 @@ export async function action({ request }: ActionFunctionArgs) {
         description: formData.get("description") as string,
       };
       console.log(updateData);
-      break;
-
-    default:
       break;
   }
 }
@@ -65,10 +90,13 @@ function StoreManagePage() {
   const [storeDescription, setStoreDescription] = useState(
     "A wonderful store with great products"
   );
-  const [queueOpen, setQueueOpen] = useState(true);
   const [storeImage, setStoreImage] = useState("/starbuck.png");
   const [isEditing, setIsEditing] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+
+  const fetcher = useFetcher();
+
+  const { shop } = useLoaderData<typeof loader>();
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setStoreName(e.target.value);
@@ -88,10 +116,6 @@ function StoreManagePage() {
     setStoreDescription(e.target.value);
   };
 
-  const toggleStoreStatus = () => {
-    setQueueOpen((prev) => !prev);
-  };
-
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files![0];
     if (file) {
@@ -104,36 +128,64 @@ function StoreManagePage() {
     setIsEditing((prev) => !prev);
   };
 
-  const fetcher = useFetcher();
+  const handleStoreStatusChange = (e: any) => {
+    e.preventDefault(); // Prevent default form submission
+
+    Swal.fire({
+      title: shop.is_open ? "Close Store?" : "Open Store?",
+      text: shop.is_open
+        ? "Are you sure you want to close your store?"
+        : "Are you sure you want to open your store?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: shop.is_open ? "#d33" : "#08db0f",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: shop.is_open ? "Yes, close it!" : "Yes, open it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Submit the form programmatically
+        fetcher.submit({ _action: "storeStatus" }, { method: "PUT" });
+
+        // Optional: Show success message after submission
+        Swal.fire(
+          "Success!",
+          shop.is_open
+            ? "Your store has been closed."
+            : "Your store is now open.",
+          "success"
+        );
+      }
+    });
+  };
 
   return (
     <div className="flex flex-col gap-5 items-center p-6">
-      <ChangePasswordModal 
+      <ChangePasswordModal
         isOpen={isPasswordModalOpen}
         onClose={() => setIsPasswordModalOpen(false)}
       />
       <div className="flex justify-end space-x-9 items-center w-full">
         <fetcher.Form method="PUT" className="flex items-center gap-4">
           <span className="font-medium flex items-center gap-2">
-            {queueOpen ? (
+            {shop.is_open ? (
               <Store className="text-green-500" size={20} />
             ) : (
               <XCircle className="text-red-500" size={20} />
             )}
-            Status: {queueOpen ? "Open" : "Closed"}
+            Status: {shop.is_open ? "Open" : "Closed"}
           </span>
           <button
             type="submit"
+            onClick={handleStoreStatusChange}
             name="_action"
             value="storeStatus"
-            onClick={toggleStoreStatus}
             className={`px-4 py-2 rounded-lg text-white cursor-pointer ${
-              queueOpen
+              shop.is_open
                 ? "bg-red-500 hover:bg-red-600"
                 : "bg-green-500 hover:bg-green-600"
             }`}
           >
-            {queueOpen ? "Close Store" : "Open Store"}
+            {shop.is_open ? "Close Store" : "Open Store"}
           </button>
         </fetcher.Form>
       </div>
