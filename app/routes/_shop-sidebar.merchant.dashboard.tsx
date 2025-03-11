@@ -16,7 +16,7 @@ import { useLoaderData, useNavigate } from "react-router";
 import { redirect, type LoaderFunctionArgs } from "react-router";
 import { authCookie } from "~/services/cookie";
 import { reminder_provider, shop_provider } from "~/provider/provider";
-import { fetchingShopReminders } from "~/apis/shop-api";
+import { fetchingShopReminders } from "~/repositories/reminder-api";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const cookie = request.headers.get("cookie");
@@ -93,7 +93,7 @@ function DashboardPage() {
       phone: "111-222-3333",
     },
   ];
- 
+
   // Mock Data for Chart
   const data = [
     { name: "Sun", count: 10 },

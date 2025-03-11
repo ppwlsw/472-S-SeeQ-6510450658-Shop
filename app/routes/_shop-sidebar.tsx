@@ -5,7 +5,7 @@ import { SidebarItem } from "~/components/sidebar-item";
 import { redirect, useLoaderData, type LoaderFunctionArgs } from "react-router";
 
 import { shop_provider } from "~/provider/provider";
-import { fetchingShopData } from "~/apis/shop-api";
+import { fetchingShopData } from "~/repositories/shop-api";
 import { getAuthCookie } from "~/services/cookie";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -101,9 +101,9 @@ const MerchantNav = () => {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center border-[1px] overflow-hidden">
-                {shop.image_uri !== undefined ? (
+                {shop.image_url !== undefined ? (
                   <img
-                    src={shop.image_uri}
+                    src={shop.image_url}
                     className="object-cover w-full h-full "
                   />
                 ) : (

@@ -6,7 +6,7 @@ interface Shop {
   address: string;
   phone: string;
   description?: string;
-  image_uri?: string;
+  image_url?: string;
   is_open: boolean;
   latitude: string;
   longitude: string;
