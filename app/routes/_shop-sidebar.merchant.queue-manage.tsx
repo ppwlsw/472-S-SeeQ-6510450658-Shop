@@ -25,7 +25,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const shop_id = shop_provider[user_id]?.id;
   try {
     const queueTypes = await fetchingQueuesType(request, shop_id);
-    setQueueProvider(shop_id, queueTypes.queueTypes);
+    // setQueueProvider(shop_id, queueTypes.queueTypes);
   } catch (e) {
     console.error(e);
   }

@@ -17,6 +17,7 @@ import { redirect, type LoaderFunctionArgs } from "react-router";
 import { getAuthCookie } from "~/services/cookie";
 import { reminder_provider, shop_provider } from "~/provider/provider";
 import { fetchingShopReminders } from "~/repositories/reminder-api";
+import { fetchingQueuesType } from "~/repositories/queues-api";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const data = await getAuthCookie({ request });
@@ -35,6 +36,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   try {
     await fetchingShopReminders(shop_id, request);
+    const queueTypes = await fetchingQueuesType(request, shop_id);
+    
   } catch (e) {
     console.error("Error fetching shop reminders:", e);
   }
@@ -135,7 +138,7 @@ function DashboardPage() {
       {/* Main Content */}
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Queues Section */}
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="bg-white rounded-xl min-w-[30vh] shadow-lg overflow-hidden">
           <div className="flex items-center justify-between p-6 border-b border-gray-100">
             <h2 className="text-2xl font-semibold text-gray-800">All Queues</h2>
             <button

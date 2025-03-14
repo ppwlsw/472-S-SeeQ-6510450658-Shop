@@ -13,6 +13,7 @@ import { reminder_provider, shop_provider } from "~/provider/provider";
 import {
   createShopReminder,
   fetchingShopReminders,
+  markReminderAsDone,
   type ReminderProp,
 } from "~/repositories/reminder-api";
 import { getAuthCookie } from "~/services/cookie";
@@ -57,8 +58,9 @@ export async function action({ request }: ActionFunctionArgs) {
 
       createShopReminder(request, payload);
       break;
-    case "markAsDone": 
+    case "markAsDone":
       const reminder_id = formData.get("reminder_id") as string;
+      await markReminderAsDone(request, parseInt(reminder_id));
       break;
   }
 

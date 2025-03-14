@@ -50,3 +50,15 @@ export async function createShopReminder(request: Request, payload : ReminderPro
         console.error("error creating reminder : ", e);
     }
 }
+
+export async function markReminderAsDone(request: Request, reminder_id: number) {
+    try {
+        const axios = useAxiosInstance(request);
+        const response = await axios.patch(`/shops/reminders/${reminder_id}`)
+        console.log("Reminder marked as done successfully:", response);
+
+    } catch (e) {
+        console.error("error marking reminder as done : ",
+        e);
+    }
+}

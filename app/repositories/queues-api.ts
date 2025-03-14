@@ -1,3 +1,4 @@
+import { setQueueProvider } from "~/provider/provider";
 import { getAuthCookie } from "~/services/cookie";
 import useAxiosInstance from "~/utils/axiosInstance";
 
@@ -36,7 +37,7 @@ export async function fetchingQueuesType(request: Request, shop_id: number) {
         
         const data = await response.json();
         const queueTypes = data.data;
-        console.log("queueTypes in repo", queueTypes);
+        setQueueProvider(shop_id, queueTypes);
         return {
             queueTypes
         };
