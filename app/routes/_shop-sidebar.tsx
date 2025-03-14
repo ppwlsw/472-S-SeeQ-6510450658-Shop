@@ -36,6 +36,8 @@ const MerchantNav = () => {
       return "จัดการคิว";
     } else if (location.pathname.startsWith("/merchant/store-management")) {
       return "จัดการร้านค้า";
+    } else if (location.pathname.startsWith("/merchant/reminders")) {
+      return "การแจ้งเตือน";
     } else {
       return "ภาพรวมร้านค้า";
     }

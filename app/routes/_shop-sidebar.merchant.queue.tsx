@@ -2,15 +2,6 @@ import { useEffect } from "react";
 import ReservationCard from "~/components/reservation-card";
 
 function QueueManagePage() {
-  // State to manage queue data
-
-  // Example data - replace with your actual data fetching logic
-  useEffect(() => {
-    // Fetch queue data here
-    // Example: fetchQueueData().then(data => setQueueItems(data));
-    // Placeholder data
-  }, []);
-
   const queueItems = [
     {
       id: 1,
@@ -45,8 +36,6 @@ function QueueManagePage() {
   ];
 
   const handleBack = () => {
-    // Add navigation logic here
-    // Example: navigate('/dashboard');
     console.log("Back button clicked");
   };
 

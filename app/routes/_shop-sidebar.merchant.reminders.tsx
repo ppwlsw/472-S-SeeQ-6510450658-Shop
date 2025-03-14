@@ -1,152 +1,178 @@
+import { Plus, X } from "lucide-react";
 import { useState } from "react";
-import { Check, Edit, Trash2, Plus } from "lucide-react";
-import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
+import {
+  redirect,
+  useFetcher,
+  useLoaderData,
+  useRevalidator,
+  type ActionFunctionArgs,
+  type LoaderFunctionArgs,
+} from "react-router";
+import ReminderCard from "~/components/reminder-card";
+import { reminder_provider, shop_provider } from "~/provider/provider";
+import {
+  createShopReminder,
+  fetchingShopReminders,
+  type ReminderProp,
+} from "~/repositories/reminder-api";
+import { getAuthCookie } from "~/services/cookie";
 
+export async function loader({ request }: LoaderFunctionArgs) {
+  const data = await getAuthCookie({ request });
+  if (!data) {
+    return redirect("/login");
+  }
+  const user_id = data.user_id;
+  const shop_id = shop_provider[user_id]?.id;
+  if (!shop_id) {
+    console.error("Shop ID is undefined");
+    return { shop: null, reminders: [] };
+  }
 
+  await fetchingShopReminders(shop_id, request);
 
-interface Reminder {
-  title: string;
-  description: string;
-  due_date: string;
-  status: boolean;
+  return {
+    shop: shop_provider[user_id] || null,
+    reminders: reminder_provider[shop_id] || [],
+  };
+}
+
+export async function action({ request }: ActionFunctionArgs) {
+  const formData = await request.formData();
+  const action = formData.get("_action");
+  const data = await getAuthCookie({ request });
+
+  if (!data) {
+    return redirect("/login");
+  }
+
+  switch (action) {
+    case "createReminder":
+      const payload: ReminderProp = {
+        shop_id: shop_provider[data.user_id]?.id,
+        title: formData.get("title") as string,
+        description: formData.get("description") as string,
+        due_date: formData.get("dateTime") as string,
+      };
+
+      createShopReminder(request, payload);
+      break;
+    case "markAsDone": 
+      const reminder_id = formData.get("reminder_id") as string;
+      break;
+  }
+
+  return {};
 }
 
 export default function RemindersPage() {
-  const [reminders, setReminders] = useState<Reminder[]>([]);
-  const [newTitle, setNewTitle] = useState("");
-  const [newDescription, setNewDescription] = useState("");
-  const [newDueDate, setNewDueDate] = useState("");
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [editedTitle, setEditedTitle] = useState("");
-  const [editedDescription, setEditedDescription] = useState("");
-  const [editedDueDate, setEditedDueDate] = useState("");
-
-  const addReminder = () => {
-    if (newTitle.trim() === "" || newDueDate.trim() === "") return;
-    setReminders([
-      ...reminders,
-      {
-        title: newTitle,
-        description: newDescription,
-        due_date: newDueDate,
-        status: false,
-      },
-    ]);
-    setNewTitle("");
-    setNewDescription("");
-    setNewDueDate("");
-  };
-
-  const deleteReminder = (index: number) => {
-    setReminders(reminders.filter((_, i) => i !== index));
-  };
-
-  const toggleDone = (index: number) => {
-    setReminders(
-      reminders.map((reminder, i) =>
-        i === index ? { ...reminder, status: !reminder.status } : reminder
-      )
-    );
-  };
-
-  const startEditing = (index: number) => {
-    setEditingIndex(index);
-    setEditedTitle(reminders[index].title);
-    setEditedDescription(reminders[index].description);
-    setEditedDueDate(reminders[index].due_date);
-  };
-
-  const saveEdit = (index: number) => {
-    const updatedReminders = [...reminders];
-    updatedReminders[index].title = editedTitle;
-    updatedReminders[index].description = editedDescription;
-    updatedReminders[index].due_date = editedDueDate;
-    setReminders(updatedReminders);
-    setEditingIndex(null);
-  };
+  const { reminders, shop } = useLoaderData<typeof loader>();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const fetcher = useFetcher();
+  const validator = useRevalidator();
 
   return (
-    <div className="max-w-lg mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Reminders</h1>
-      <div className="flex flex-col gap-2 mb-4">
-        <Input
-          value={newTitle}
-          onChange={(e) => setNewTitle(e.target.value)}
-          placeholder="Title"
-        />
-        <Input
-          value={newDescription}
-          onChange={(e) => setNewDescription(e.target.value)}
-          placeholder="Description"
-        />
-        <Input
-          type="date"
-          value={newDueDate}
-          onChange={(e) => setNewDueDate(e.target.value)}
-        />
-        <Button onClick={addReminder} className="bg-blue-500">
-          <Plus size={18} />
-        </Button>
+    <div className="max-w-full mx-auto p-4 relative">
+      {/* Add button */}
+      <div className="flex flex-row justify-end my-4">
+        <button
+          className="bg-white rounded-full p-3
+          border border-black shadow-md
+          hover:bg-black hover:text-white hover:border-white active:scale-90 
+          transition"
+          onClick={() => setIsModalOpen(true)}
+        >
+          <Plus />
+        </button>
       </div>
-      <ul>
-        {reminders.map((reminder, index) => (
-          <li className="flex flex-col bg-gray-100 p-2 mb-2 rounded-md">
-            {editingIndex === index ? (
-              <div className="flex flex-col gap-2">
-                <Input
-                  value={editedTitle}
-                  onChange={(e) => setEditedTitle(e.target.value)}
-                  autoFocus
-                />
-                <Input
-                  value={editedDescription}
-                  onChange={(e) => setEditedDescription(e.target.value)}
-                />
-                <Input
-                  type="date"
-                  value={editedDueDate}
-                  onChange={(e) => setEditedDueDate(e.target.value)}
-                />
-              </div>
-            ) : (
-              <div>
-                <p className="font-bold">{reminder.title}</p>
-                <p className="text-sm text-gray-600">{reminder.description}</p>
-                <p className="text-sm text-gray-600">
-                  Due: {reminder.due_date}
-                </p>
-                <p
-                  className={
-                    reminder.status ? "text-green-600" : "text-red-600"
-                  }
-                >
-                  {reminder.status ? "Completed" : "Pending"}
-                </p>
-              </div>
-            )}
-            <div className="flex gap-2 mt-2">
-              {editingIndex === index ? (
-                <Button size="sm" onClick={() => saveEdit(index)}>
-                  Save
-                </Button>
-              ) : (
-                <>
-                  <Button size="icon" onClick={() => toggleDone(index)}>
-                    <Check size={18} />
-                  </Button>
-                  <Button size="icon" onClick={() => startEditing(index)}>
-                    <Edit size={18} />
-                  </Button>
-                  <Button size="icon" onClick={() => deleteReminder(index)}>
-                    <Trash2 size={18} />
-                  </Button>
-                </>
-              )}
+
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">Create Reminder</h2>
+              <button
+                onClick={() => {
+                  setIsModalOpen(false);
+                  validator.revalidate();
+                }}
+              >
+                <X className="w-6 h-6" />
+              </button>
             </div>
-          </li>
-        ))}
-      </ul>
+
+            <fetcher.Form
+              method="POST"
+              className="space-y-4"
+              onSubmit={() => {
+                setIsModalOpen(false);
+              }}
+            >
+              <div>
+                <label className="block text-sm font-medium">Title</label>
+                <input
+                  type="text"
+                  name="title"
+                  required
+                  className="w-full p-2 border border-gray-300 rounded"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium">Description</label>
+                <textarea
+                  name="description"
+                  rows={3}
+                  required
+                  className="w-full p-2 border border-gray-300 rounded"
+                ></textarea>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium">Date & Time</label>
+                <input
+                  type="datetime-local"
+                  name="dateTime"
+                  required
+                  className="w-full p-2 border border-gray-300 rounded"
+                />
+              </div>
+
+              <div className="flex justify-end space-x-2">
+                <button
+                  type="button"
+                  className="px-4 py-2 bg-gray-300 rounded"
+                  onClick={() => setIsModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  name="_action"
+                  value="createReminder"
+                  type="submit"
+                  className="px-4 py-2 bg-black text-white rounded"
+                >
+                  Create
+                </button>
+              </div>
+            </fetcher.Form>
+          </div>
+        </div>
+      )}
+
+      {/* Reminder List */}
+      {reminders.length > 0 ? (
+        <div className="flex flex-wrap gap-4">
+          {reminders.map((reminder, index) => (
+            <ReminderCard time={reminder.due_date} key={index} {...reminder} />
+          ))}
+        </div>
+      ) : (
+        <div className="flex w-full h-full">
+          <h1>No Reminders</h1>
+        </div>
+      )}
     </div>
   );
 }

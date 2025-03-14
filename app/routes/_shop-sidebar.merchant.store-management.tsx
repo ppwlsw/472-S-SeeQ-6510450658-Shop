@@ -134,8 +134,6 @@ function ShopManagePage() {
   const validator = useRevalidator();
   const [previewImage, setPreviewImage] = useState<any>(shopImage);
 
-  console.log("Current URL", shopImage);
-
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
