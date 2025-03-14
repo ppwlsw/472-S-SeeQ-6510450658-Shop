@@ -1,19 +1,64 @@
+import { data } from "react-router";
 import { setShopReminder, reminder_provider } from "~/provider/provider";
-import { authCookie } from "~/services/cookie";
 import useAxiosInstance from "~/utils/axiosInstance";
 
-export async function fetchingShopReminders(shop_id : number, request: Request) {
+export interface ReminderProp {
+    shop_id : number,
+    title : string,
+    description: string,
+    due_date : any
+}
+
+export async function fetchingShopReminders(shop_id: number, request: Request) {
     try {
         const axios = useAxiosInstance(request);
-        const reminders : any = await axios.get("/shops/reminders/"+shop_id+"");
+        const response = await axios.get(`/shops/reminders/${shop_id}`);
 
-        setShopReminder(shop_id ,reminders);
+        const reminders = response
+        console.log("Fetched Reminders:", reminders);
 
-      } catch (error) {
-        console.error(error);
+        if (!Array.isArray(reminders)) {
+            console.error("Invalid reminder data format:", reminders);
+            return { code: 500, data: [] };
+        }
+
+        reminder_provider[shop_id] = [];
+
+        for (const reminder of reminders) {
+            setShopReminder(shop_id, reminder);
+        }
+
+    } catch (error) {
+        console.error("Error fetching reminders:", error);
+        return { code: 500, data: [] };
     }
+
     return {
-        "code": 200,
-        "data" : [reminder_provider[shop_id]]
+        code: 200,
+        data: reminder_provider[shop_id] || [], // Ensure it's an array
+    };
+}
+
+
+export async function createShopReminder(request: Request, payload : ReminderProp) {
+    try {
+        const axios = useAxiosInstance(request);
+        const response = await axios.post(`/shops/reminders`, payload)
+        console.log("Reminder created successfully:", response);
+
+    } catch (e) {
+        console.error("error creating reminder : ", e);
+    }
+}
+
+export async function markReminderAsDone(request: Request, reminder_id: number) {
+    try {
+        const axios = useAxiosInstance(request);
+        const response = await axios.patch(`/shops/reminders/${reminder_id}`)
+        console.log("Reminder marked as done successfully:", response);
+
+    } catch (e) {
+        console.error("error marking reminder as done : ",
+        e);
     }
 }

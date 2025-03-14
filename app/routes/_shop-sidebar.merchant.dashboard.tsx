@@ -12,32 +12,41 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { useLoaderData, useNavigate } from "react-router";
+import { Link, useLoaderData, useNavigate } from "react-router";
 import { redirect, type LoaderFunctionArgs } from "react-router";
-import { authCookie } from "~/services/cookie";
+import { getAuthCookie } from "~/services/cookie";
 import { reminder_provider, shop_provider } from "~/provider/provider";
 import { fetchingShopReminders } from "~/repositories/reminder-api";
+import { fetchingQueuesType } from "~/repositories/queues-api";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const cookie = request.headers.get("cookie");
-  const data = await authCookie.parse(cookie);
+  const data = await getAuthCookie({ request });
 
   if (!data) {
     return redirect("/login");
   }
 
   const user_id = data.user_id;
-  const shop_id = shop_provider[user_id].id;
+  const shop_id = shop_provider[user_id]?.id;
+
+  if (!shop_id) {
+    console.error("Shop ID is undefined");
+    return { shop: null, reminders: [] };
+  }
 
   try {
     await fetchingShopReminders(shop_id, request);
+    const queueTypes = await fetchingQueuesType(request, shop_id);
+    
   } catch (e) {
-    console.error("Error fetching shop ", e);
+    console.error("Error fetching shop reminders:", e);
   }
 
+  console.log("Final Reminders in loader:", reminder_provider[shop_id]);
+
   return {
-    shop: shop_provider[user_id],
-    reminders: reminder_provider[shop_id],
+    shop: shop_provider[user_id] || null,
+    reminders: reminder_provider[shop_id] || [], // Ensure it's an array
   };
 }
 
@@ -111,8 +120,7 @@ function DashboardPage() {
     navigate("/merchant/queue-manage");
   };
 
-  const { shop } = useLoaderData<typeof loader>();
-  const { reminders } = useLoaderData();
+  const { shop, reminders } = useLoaderData<typeof loader>();
 
   return (
     <div className="flex flex-col gap-8 p-6 bg-gray-50 min-h-screen">
@@ -130,7 +138,7 @@ function DashboardPage() {
       {/* Main Content */}
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Queues Section */}
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="bg-white rounded-xl min-w-[30vh] shadow-lg overflow-hidden">
           <div className="flex items-center justify-between p-6 border-b border-gray-100">
             <h2 className="text-2xl font-semibold text-gray-800">All Queues</h2>
             <button
@@ -155,32 +163,32 @@ function DashboardPage() {
               <h2 className="text-2xl font-semibold text-gray-800">
                 Reminders
               </h2>
-              <button className="text-blue-600 hover:text-blue-800 font-medium transition-colors">
+              <Link
+                to={"/merchant/reminders"}
+                className="text-blue-600 hover:text-blue-800 font-medium transition-colors"
+              >
                 View All
-              </button>
+              </Link>
             </div>
-            <div className="p-6 overflow-x-auto">
-              <div className="flex gap-4">
-                {reminders.map((reminder: any, index: number) => {
-                  return (
-                    <ReminderCard
-                      key={reminder.id}
-                      title={reminder.title}
-                      time={new Date(reminder.due_date).toLocaleString(
-                        "th-TH",
-                        {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          second: "2-digit",
-                        }
-                      )}
-                      description={reminder.description}
-                    />
-                  );
-                })}
+            <div className="p-6 max-h-96 overflow-y-auto">
+              <div className="flex flex-wrap gap-4">
+                {reminders.length != 0 ? (
+                  reminders.map((reminder: any, index: number) => {
+                    return (
+                      <ReminderCard
+                        key={index}
+                        id={reminder.id}
+                        title={reminder.title}
+                        time={new Date(reminder.due_date)}
+                        description={reminder.description}
+                      />
+                    );
+                  })
+                ) : (
+                  <div>
+                    <h1>ไม่มีการแจ้งเตือน</h1>
+                  </div>
+                )}
               </div>
             </div>
           </div>

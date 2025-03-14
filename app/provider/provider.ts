@@ -26,9 +26,25 @@ interface Reminder {
   updated_at: Date;
 }
 
+interface QueueType {
+  id: number;
+  name: string;
+  description: string;
+  queue_image_url?: string;
+  queue_counter: number;
+  is_available: boolean;
+  tag: string;
+  shop_id: number;
+  created_at: Date;
+  updated_at: Date;
+}
+
+
 let shop_provider: Record<number, Shop> = {};
 
-let reminder_provider: Record<number, Reminder> = {};
+let reminder_provider: Record<number, Reminder[]> = {};
+
+let queue_provider: Record<number, QueueType[]> = {};
 
 function setShopProvider(user_id: number, shop: Shop) {
   shop_provider[user_id] = shop;
@@ -39,8 +55,15 @@ function updateShopOpenStatus(user_id: number) {
 }
 
 function setShopReminder(shop_id: number, reminder: Reminder) {
-  reminder_provider[shop_id] = reminder;
+  if (!reminder_provider[shop_id]) {
+    reminder_provider[shop_id] = [];
+  }
+  reminder_provider[shop_id].push(reminder);
 }
 
-export { shop_provider, reminder_provider };
-export { setShopProvider, setShopReminder, updateShopOpenStatus };
+function setQueueProvider(shop_id: number, queueTypes: QueueType[]) {
+  queue_provider[shop_id] = queueTypes;
+}
+
+export { shop_provider, reminder_provider, queue_provider};
+export { setShopProvider, setShopReminder, updateShopOpenStatus, setQueueProvider };

@@ -48,14 +48,13 @@ export async function updateShop(shop_id : number, updateRequest : UpdateShopReq
     console.log(shop_id, updateRequest);
     const axios = useAxiosInstance(request);
     var response = await axios.put(`shops/${shop_id}`, updateRequest)
-    console.log("RESPONSE : ", response);
   } catch (e) {
     console.error(e);
   }
-  // return {
-  //   "code" : 200,
-  //   "data" : response!.data,
-  // }
+  return {
+    "code" : 200,
+    "data" : response!.data,
+  }
 }
 
 export async function changeshopAvatar(shop_id: number, formData: FormData, request: Request) {

@@ -1,19 +1,19 @@
 // React Router generated types for route:
-// routes/_shop-sidebar.merchant.queue.tsx
+// routes/_shop-sidebar.merchant.queue.$queue_id.tsx
 
 import type * as T from "react-router/route-module"
 
 import type { Info as Parent0 } from "../../+types/root.js"
 import type { Info as Parent1 } from "./_shop-sidebar.js"
 
-type Module = typeof import("../_shop-sidebar.merchant.queue.js")
+type Module = typeof import("../_shop-sidebar.merchant.queue.$queue_id.js")
 
 export type Info = {
   parents: [Parent0, Parent1],
-  id: "routes/_shop-sidebar.merchant.queue"
-  file: "routes/_shop-sidebar.merchant.queue.tsx"
-  path: "merchant/queue"
-  params: {} & { [key: string]: string | undefined }
+  id: "routes/_shop-sidebar.merchant.queue.$queue_id"
+  file: "routes/_shop-sidebar.merchant.queue.$queue_id.tsx"
+  path: "merchant/queue/:queue_id"
+  params: {"queue_id": string} & { [key: string]: string | undefined }
   module: Module
   loaderData: T.CreateLoaderData<Module>
   actionData: T.CreateActionData<Module>
