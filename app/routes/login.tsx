@@ -1,4 +1,4 @@
-import { Eye, EyeClosed, Store } from "lucide-react";
+import { CircleX, Eye, EyeClosed, Store } from "lucide-react";
 import { useState } from "react";
 import { redirect, useFetcher, type ActionFunctionArgs } from "react-router";
 import Wave from "~/components/wave";
@@ -9,10 +9,15 @@ import { motion } from "framer-motion";
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const action: string = formData.get("_action") as string;
+
+  if (action === "reset") {
+    return null;
+  }
+
   if (action === "default_login") {
     formData.set("email", (formData.get("email") as string).toLowerCase());
     const error = validateInput(formData);
-
+    
     if (error) {
       return error;
     }
@@ -23,6 +28,7 @@ export async function action({ request }: ActionFunctionArgs) {
     });
 
     if (response.status !== 201) {
+
       return {
         message: "",
         error: response.error,
@@ -37,6 +43,9 @@ export async function action({ request }: ActionFunctionArgs) {
         status: 403,
       };
     }
+
+
+
 
     const token: string = response.data.token;
     const user_id: number = response.data.id;
@@ -163,44 +172,77 @@ function LoginFetcherForm() {
         >
           เข้าสู่ระบบ
         </button>
-        <p
-          className={`w-full text-red-500 text-center border border-red-500 bg-red-100 p-1 rounded-md ${
-            fetcher.data?.error && fetcher.state === "idle"
-              ? "opacity-100"
-              : "opacity-0"
-          }`}
-        >
-          {fetcher.data?.error ? fetcher.data.error : "error"}
-        </p>
       </div>
     </fetcher.Form>
   );
 }
 
-function LoadingModal({ state }: { state: string }) {
+function LoginModal({ fetcherKey }: {fetcherKey: string}) {
+  const fetcher = useFetcher<ActionMessage>({
+    key: fetcherKey,
+  });
   return (
     <motion.div
       initial={{ opacity: 0, display: "none" }}
       animate={{
         opacity: 1,
-        display: state === "submitting" ? "flex" : "none",
-        transition: { duration: 1, ease: "easeIn" },
+        display:
+          fetcher.formData?.get("_action") != "reset" &&
+          (fetcher.state === "submitting" || fetcher.data?.error != undefined)
+            ? "flex"
+            : "none",
+        transition: {
+          duration: fetcher.formData?.get("_action") != "reset" ? 1 : 0,
+          ease: "easeIn",
+        },
       }}
-      className="flex flex-col justify-center items-center absolute w-full h-full z-50 text-obsidian"
+      className="absolute z-50 top-0 flex flex-col justify-center items-center w-full h-full text-obsidian"
+      onClick={() => {
+        fetcher.submit(
+          {
+            _action: "reset",
+          },
+          {
+            method: "POST",
+          }
+        );
+      }}
     >
       <div className="relative w-full h-full bg-obsidian opacity-25"></div>
       <div className="flex flex-col justify-center items-center gap-3 absolute rounded-lg shadow-lg bg-white-smoke p-6">
-        <p className="text-xl text-obsidian">กำลังโหลด...</p>
-        <span className="inline-block w-[20px] h-[20px] border-4 border-gray-400 rounded-full border-t-white-smoke animate-spin"></span>
+        {fetcher.data?.error == undefined ? (
+          <span className="inline-block w-[20px] h-[20px] border-4 border-gray-400 rounded-full border-t-white-smoke animate-spin"></span>
+        ) : (
+          <motion.div
+            initial={{
+              rotate: 90,
+            }}
+            animate={{
+              rotate: 0,
+              transition: { duration: 0.3, ease: "easeIn" },
+            }}
+          >
+            <CircleX size={36} color="#F44336" />
+          </motion.div>
+        )}
+        <motion.p
+          animate={{
+            opacity: 1,
+            color: fetcher.data?.error != undefined ? "#F44336" : "#0b1215",
+            transition: { duration: 0.3, ease: "easeIn" },
+          }}
+          className="text-xl text-obsidian"
+        >
+          {fetcher.data?.error != undefined
+            ? fetcher.data.error
+            : "กำลังโหลด..."}
+        </motion.p>
       </div>
     </motion.div>
   );
 }
 
 export default function Login() {
-  const fetcher = useFetcher<ActionMessage>({
-    key: "LoginFetcher",
-  });
   return (
     <div className="flex flex-col h-svh w-svw bg-white-smoke relative overflow-hidden">
       {/* Main content */}
@@ -234,8 +276,8 @@ export default function Login() {
       </div>
 
       {/* Loading */}
+      <LoginModal fetcherKey="LoginFetcher"/>
 
-      <LoadingModal state={fetcher.state} />
     </div>
   );
 }
