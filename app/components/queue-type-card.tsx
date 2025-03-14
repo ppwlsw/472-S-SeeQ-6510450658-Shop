@@ -1,6 +1,6 @@
-import { useNavigate } from "react-router";
 import type { QueueType } from "~/repositories/queues-api";
-import { Utensils, Calendar, Users, Tag } from "lucide-react";
+import { Utensils, Users, Tag } from "lucide-react";
+import { useNavigate } from "react-router";
 
 export default function QueueTypeCard({ queueType }: { queueType: QueueType }) {
   const navigate = useNavigate();
@@ -9,16 +9,20 @@ export default function QueueTypeCard({ queueType }: { queueType: QueueType }) {
     navigate(`/merchant/queue/${queueType.id}`);
   };
 
+  console.log("Queue Type Card", queueType);
+
   return (
     <div
       onClick={handleClick}
-      className="flex flex-col bg-white border border-gray-200 rounded-2xl p-6 shadow-md hover:shadow-lg cursor-pointer transition duration-150 ease-in-out w-80"
+      className="flex flex-col bg-white border border-gray-200 rounded-2xl p-6 shadow-md hover:shadow-lg active:scale-95 cursor-pointer transition duration-150 ease-in-out w-80"
+      role="button"
+      tabIndex={0} // Adds keyboard accessibility
     >
       {/* Image Section */}
       <div className="w-full flex justify-center mb-4">
-        {queueType.queue_image_url ? (
+        {queueType.image_url ? (
           <img
-            src={queueType.queue_image_url}
+            src={queueType.image_url}
             alt={queueType.name}
             className="w-20 h-20 object-cover rounded-full border border-gray-300"
           />

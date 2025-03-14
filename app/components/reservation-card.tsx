@@ -3,23 +3,12 @@ import { MapPin, Phone } from "lucide-react";
 interface ReservationCardProps {
   id: number;
   name: string;
-  time: string;
-  date: string;
   table: string;
-  capacity: string;
   status: string;
   phone: string;
 }
 
-function ReservationCard({
-  name,
-  time,
-  date,
-  table,
-  capacity,
-  status,
-  phone,
-}: ReservationCardProps) {
+function ReservationCard({ name, table, status, phone }: ReservationCardProps) {
   // Status styling logic
   const getStatusStyles = (status: string) => {
     switch (status) {
@@ -41,9 +30,7 @@ function ReservationCard({
         className="border-b-[1px] border-gray-200 flex flex-col h-2/3"
       >
         <div className="flex flex-row justify-between items-center">
-          <div className="font-bold">
-            {table} ({capacity})
-          </div>
+          <div className="font-bold">{table}</div>
           <div
             className={`px-4 py-2 rounded-md text-xs font-bold ${getStatusStyles(
               status
@@ -54,9 +41,7 @@ function ReservationCard({
         </div>
         <div className="flex flex-col my-7">
           <div className="text-2xl font-bold overflow-ellipsis">{name}</div>
-          <div className="text-[#718EBF] text-sm font-semibold">
-            {time} | {date}
-          </div>
+          <div className="text-[#718EBF] text-sm font-semibold"></div>
         </div>
       </section>
       {/* //================= Lower Section ================= */}

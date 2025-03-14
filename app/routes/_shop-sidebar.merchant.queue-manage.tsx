@@ -29,7 +29,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   } catch (e) {
     console.error(e);
   }
-  return { queuesType: queue_provider[shop_id] || [] };
+  return { queuesType: queue_provider[shop_id] || [], shop_id: shop_id };
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -41,15 +41,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   switch (action) {
     case "createQueueType":
-      const payload = {
-        shop_id: shop_provider[data.user_id]?.id,
-        name: formData.get("name") as string,
-        description: formData.get("description") as string,
-        is_available: formData.get("is_available") === "true",
-        queue_image_url: formData.get("queue_image") as File,
-        tag: formData.get("tag") as string,
-      };
-      await createQueueType(request, payload);
+      await createQueueType(request, formData);
       break;
   }
 
@@ -57,7 +49,7 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 function QueueTypeManagePage() {
-  const { queuesType } = useLoaderData<typeof loader>();
+  const { queuesType, shop_id } = useLoaderData<typeof loader>();
   const fetcher = useFetcher();
   const revalidator = useRevalidator();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -97,6 +89,12 @@ function QueueTypeManagePage() {
               className="space-y-4"
               onSubmit={() => setIsModalOpen(false)}
             >
+              <input
+                type="number"
+                name="shop_id"
+                value={shop_id}
+                className="hidden"
+              />
               {/* Image Upload */}
               <div>
                 <label className="block text-sm font-medium">
@@ -104,17 +102,11 @@ function QueueTypeManagePage() {
                 </label>
                 <input
                   type="file"
-                  name="queue_image"
-                  accept="image/*"
-                  required
+                  name="image"
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) {
-                      const reader = new FileReader();
-                      reader.onload = (event) => {
-                        setPreviewImage(event.target?.result as string);
-                      };
-                      reader.readAsDataURL(file);
+                      setPreviewImage(URL.createObjectURL(file));
                     }
                   }}
                   className="w-full p-2 border border-gray-300 rounded"
@@ -204,7 +196,7 @@ function QueueTypeManagePage() {
 
       {/* Queue Type List */}
       {queuesType.length > 0 ? (
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap gap-4 max-h-[78vh] overflow-y-auto">
           {queuesType.map((queueType, index) => (
             <QueueTypeCard key={index} queueType={queueType} />
           ))}
