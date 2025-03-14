@@ -1,5 +1,5 @@
 import { setQueueProvider } from "~/provider/provider";
-import { getAuthCookie } from "~/services/cookie";
+import { authCookie, getAuthCookie } from "~/services/cookie";
 import useAxiosInstance from "~/utils/axiosInstance";
 
 export interface QueueType {
@@ -51,10 +51,18 @@ export async function fetchingQueuesType(request: Request, shop_id: number) {
 export async function createQueueType(request: Request, payload: FormData) {
     console.log("payload", payload);
     try {
-        const axios = useAxiosInstance(request);
-        const response = await axios.post(`/queues`, payload);
-
-        console.log("Queue type created successfully:", response);
+        const cookie = request.headers.get("cookie");
+        const data = await authCookie.parse(cookie);
+        const token = data.token;
+        const response = await fetch(`${process.env.APP_URL}/queues`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+          body: payload, 
+        });
+    
+        console.log("Queue type created successfully:", await response.json());
 
     } catch (e) {
         console.error("error creating queue type : ", e);
