@@ -1,5 +1,5 @@
 import { setQueueProvider } from "~/provider/provider";
-import { authCookie, getAuthCookie } from "~/services/cookie";
+import { authCookie, getAuthCookie } from "~/utils/cookie";
 import useAxiosInstance from "~/utils/axiosInstance";
 
 export interface QueueType {

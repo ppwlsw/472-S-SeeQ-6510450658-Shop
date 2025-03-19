@@ -1,5 +1,5 @@
 import { setShopProvider, shop_provider, updateShopOpenStatus } from "~/provider/provider";
-import { authCookie } from "~/services/cookie";
+import { authCookie } from "~/utils/cookie";
 import useAxiosInstance from "~/utils/axiosInstance";
 
 export interface UpdateShopRequest {

@@ -13,7 +13,7 @@ import {
   fetchQueueDetail,
   nextQueue,
 } from "~/repositories/queues-api";
-import { getAuthCookie } from "~/services/cookie";
+import { getAuthCookie } from "~/utils/cookie";
 import Swal from "sweetalert2";
 import { useEffect } from "react";
 

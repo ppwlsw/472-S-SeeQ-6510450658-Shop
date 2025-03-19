@@ -1,6 +1,6 @@
 import axios, { type AxiosInstance } from "axios";
 import axiosRetry from "axios-retry";
-import { authCookie, getAuthCookie } from "~/services/cookie";
+import { authCookie, getAuthCookie } from "~/utils/cookie";
 
 async function parseCookie(s: string) {
     return await authCookie.parse(s);

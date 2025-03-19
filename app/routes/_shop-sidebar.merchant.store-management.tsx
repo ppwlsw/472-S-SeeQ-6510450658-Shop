@@ -19,7 +19,7 @@ import {
 } from "react-router";
 import ChangePasswordModal from "~/components/change-password";
 import { shop_provider } from "~/provider/provider";
-import { authCookie } from "~/services/cookie";
+import { authCookie } from "~/utils/cookie";
 import {
   changeshopAvatar,
   changeShopOpenStatus,
