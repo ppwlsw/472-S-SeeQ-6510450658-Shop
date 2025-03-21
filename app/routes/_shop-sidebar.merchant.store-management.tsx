@@ -9,6 +9,10 @@ import {
   Phone,
   MapPin,
   FileText,
+  Eye,
+  EyeOff,
+  CheckCircle,
+  LogOut,
 } from "lucide-react";
 import {
   redirect,
@@ -17,7 +21,6 @@ import {
   useRevalidator,
   type ActionFunctionArgs,
 } from "react-router";
-import ChangePasswordModal from "~/components/change-password";
 import { shop_provider } from "~/provider/provider";
 import { authCookie } from "~/utils/cookie";
 import {
@@ -28,6 +31,7 @@ import {
   type UpdateShopRequest,
 } from "~/repositories/shop-api";
 import Swal from "sweetalert2";
+import { ChangePasswordModal } from "~/components/change-password-modal";
 
 export async function loader({ request }: ActionFunctionArgs) {
   const cookie = request.headers.get("cookie");
@@ -81,8 +85,12 @@ export async function action({ request }: ActionFunctionArgs) {
 
     case "changeShopImage":
       changeshopAvatar(shop_id, formData, request);
-
       break;
+
+    case "changePassword":
+      // Handle password change logic here
+      // For now just simulating success
+      return { success: true };
   }
 }
 
@@ -132,9 +140,9 @@ function ShopManagePage() {
   };
 
   const validator = useRevalidator();
-  const [previewImage, setPreviewImage] = useState<any>(shopImage);
+  const [previewImage, setPreviewImage] = useState(shopImage);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (event: any) => {
     const file = event.target.files?.[0];
     if (file) {
       setPreviewImage(URL.createObjectURL(file));
@@ -143,138 +151,197 @@ function ShopManagePage() {
   };
 
   return (
-    <div className="flex flex-col gap-5 items-center p-6">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       <ChangePasswordModal
         isOpen={isPasswordModalOpen}
         onClose={() => setIsPasswordModalOpen(false)}
       />
-      <div className="flex justify-end space-x-9 items-center w-full">
-        <fetcher.Form method="PUT" className="flex items-center gap-4">
-          <span className="font-medium flex items-center gap-2">
-            {shop.is_open ? (
-              <Store className="text-green-500" size={20} />
-            ) : (
-              <XCircle className="text-red-500" size={20} />
-            )}
-            Status: {shop.is_open ? "Open" : "Closed"}
-          </span>
-          <button
-            type="submit"
-            onClick={handleShopStatusChange}
-            name="_action"
-            value="shopStatus"
-            className={`px-4 py-2 rounded-lg text-white cursor-pointer ${
-              shop.is_open
-                ? "bg-red-500 hover:bg-red-600"
-                : "bg-green-500 hover:bg-green-600"
-            }`}
-          >
-            {shop.is_open ? "Close Shop" : "Open Shop"}
-          </button>
-        </fetcher.Form>
+
+      {/* Header */}
+      <div className="bg-white shadow-md py-6 px-8 mb-8">
+        <div className="max-w-6xl mx-auto flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+            <Store className="text-blue-600" size={24} />
+            Shop Management
+          </h1>
+
+          <div className="flex items-center gap-3">
+            <fetcher.Form method="PUT" className="flex items-center gap-4">
+              <span className="font-medium flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full">
+                {shop.is_open ? (
+                  <Store className="text-green-500" size={18} />
+                ) : (
+                  <XCircle className="text-red-500" size={18} />
+                )}
+                <span
+                  className={shop.is_open ? "text-green-700" : "text-red-700"}
+                >
+                  {shop.is_open ? "Open" : "Closed"}
+                </span>
+              </span>
+              <button
+                type="submit"
+                onClick={handleShopStatusChange}
+                name="_action"
+                value="shopStatus"
+                className={`px-4 py-2 rounded-lg text-white cursor-pointer shadow-sm transition-all duration-200 ${
+                  shop.is_open
+                    ? "bg-red-500 hover:bg-red-600 hover:shadow-md"
+                    : "bg-green-500 hover:bg-green-600 hover:shadow-md"
+                }`}
+              >
+                {shop.is_open ? "Close Shop" : "Open Shop"}
+              </button>
+            </fetcher.Form>
+
+            <button
+              className="bg-gray-100 hover:bg-gray-200 p-2 rounded-full text-gray-700"
+              title="Sign Out"
+            >
+              <LogOut size={20} />
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div className="w-full max-w-2xl p-4 shadow-lg border rounded-lg">
-        <div className="flex flex-col h-fit items-center space-y-4">
-          {/* Edit/View Profile Section */}
-          <div className="flex flex-col items-center">
-            <fetcher.Form
-              onSubmit={() => {
-                validator.revalidate();
-                setIsChangingImage(false);
-              }}
-              encType="multipart/form-data"
-              method="POST"
-              className="flex flex-col items-center relative"
-            >
-              <label htmlFor="shop-image">
-                <div className="rounded-full w-44 h-44 overflow-hidden border group relative">
-                  {shopImage !== undefined ? (
-                    <img
-                      src={previewImage}
-                      className="object-cover w-full h-full "
+      <div className="max-w-4xl mx-auto px-4">
+        <div className="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-200">
+          {/* Shop Banner */}
+          <div className="h-40 bg-gradient-to-r from-blue-500 to-blue-600 relative">
+            <div className="absolute -bottom-16 left-8">
+              <fetcher.Form
+                onSubmit={() => {
+                  validator.revalidate();
+                  setIsChangingImage(false);
+                }}
+                encType="multipart/form-data"
+                method="POST"
+                className="relative"
+              >
+                <label htmlFor="shop-image">
+                  <div className="rounded-full w-32 h-32 overflow-hidden border-4 border-white shadow-lg group relative cursor-pointer">
+                    {shopImage !== undefined ? (
+                      <img
+                        src={previewImage}
+                        className="object-cover w-full h-full"
+                        alt="Shop profile"
+                      />
+                    ) : (
+                      <img
+                        src="/default_img.jpg"
+                        className="object-cover w-full h-full"
+                        alt="Default shop profile"
+                      />
+                    )}
+                    <div className="w-full h-full absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Camera className="text-white" size={28} />
+                    </div>
+                    <input
+                      id="shop-image"
+                      name="image"
+                      type="file"
+                      className="opacity-0 absolute inset-0 cursor-pointer"
+                      onChange={handleFileChange}
                     />
-                  ) : (
-                    <img
-                      src="/default_img.jpg"
-                      className="object-cover w-full h-full "
-                    />
-                  )}
-                  <div className="w-44 h-44 absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
-                    <Camera className="text-white" size={36} />
                   </div>
+                </label>
+                {isChangingImage && (
+                  <button
+                    type="submit"
+                    name="_action"
+                    value="changeShopImage"
+                    className="absolute -bottom-2 -right-2 bg-blue-600 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-colors"
+                  >
+                    <CheckCircle size={18} />
+                  </button>
+                )}
+              </fetcher.Form>
+            </div>
+          </div>
+
+          <div className="pt-20 px-8 pb-8">
+            <div className="flex justify-end gap-3 mb-6">
+              <button
+                type="button"
+                onClick={() => setIsPasswordModalOpen(true)}
+                className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 flex items-center gap-2 transition duration-200"
+              >
+                <Lock size={16} />
+                Change Password
+              </button>
+
+              <button
+                type="button"
+                onClick={handleEditButton}
+                className={`px-4 py-2 rounded-lg flex items-center gap-2 transition duration-200 ${
+                  isEditing
+                    ? "bg-gray-200 hover:bg-gray-300 text-gray-700"
+                    : "bg-blue-600 hover:bg-blue-700 text-white"
+                }`}
+              >
+                {isEditing ? (
+                  <>
+                    <XCircle size={16} /> Cancel
+                  </>
+                ) : (
+                  <>
+                    <Pencil size={16} /> Edit Profile
+                  </>
+                )}
+              </button>
+            </div>
+
+            <fetcher.Form
+              method="PUT"
+              className="space-y-6"
+              onSubmit={() => {
+                setIsEditing(false);
+              }}
+            >
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label
+                    htmlFor="name"
+                    className="font-medium flex items-center gap-2 text-gray-700 mb-2"
+                  >
+                    <Store size={16} className="text-blue-600" /> Store Name
+                  </label>
                   <input
-                    id="shop-image"
-                    name="image"
-                    type="file"
-                    className="opacity-0 absolute inset-0 "
-                    onChange={handleFileChange}
+                    disabled={!isEditing}
+                    id="name"
+                    name="name"
+                    defaultValue={shopName}
+                    className={`w-full p-3 border rounded-lg focus:ring focus:ring-blue-200 ${
+                      isEditing ? "bg-white" : "bg-gray-50 text-gray-700"
+                    }`}
                   />
                 </div>
-              </label>
-              {isChangingImage && (
-                <button
-                  type="submit"
-                  name="_action"
-                  value="changeShopImage"
-                  className="bg-sky-900 text-white px-4 py-2 rounded-lg my-4 cursor-pointer hover:bg-rose-400 active:scale-110 z-10 "
-                >
-                  ยืนยัน
-                </button>
-              )}
-            </fetcher.Form>
-          </div>
 
-          {/* Separate Edit Button from Form */}
-          <div className="flex justify-center gap-4 mb-4">
-            <button
-              type="button"
-              onClick={() => setIsPasswordModalOpen(true)}
-              className="px-4 py-2 rounded-lg bg-blue-800 hover:bg-blue-900 text-white flex items-center gap-2 cursor-pointer"
-            >
-              <Lock size={18} />
-              Change Password
-            </button>
-
-            <button
-              type="button"
-              onClick={handleEditButton}
-              className="px-4 py-2 rounded-lg bg-blue-800 hover:bg-blue-900 text-white flex items-center gap-2 cursor-pointer"
-            >
-              <Pencil size={18} /> Edit
-            </button>
-          </div>
-
-          <fetcher.Form
-            method="PUT"
-            className="w-full space-y-6"
-            onSubmit={() => {
-              setIsEditing(false);
-            }}
-          >
-            <div className="w-full space-y-4">
-              <div>
-                <label
-                  htmlFor="name"
-                  className="font-medium flex items-center gap-2"
-                >
-                  <Store size={16} /> Store Name
-                </label>
-                <input
-                  disabled={!isEditing}
-                  id="name"
-                  name="name"
-                  defaultValue={shopName}
-                  className="mt-2 w-full p-2 border rounded-lg"
-                />
+                <div>
+                  <label
+                    htmlFor="phone"
+                    className="font-medium flex items-center gap-2 text-gray-700 mb-2"
+                  >
+                    <Phone size={16} className="text-blue-600" /> Phone Number
+                  </label>
+                  <input
+                    disabled={!isEditing}
+                    id="phone"
+                    name="phone"
+                    defaultValue={shopPhone}
+                    className={`w-full p-3 border rounded-lg focus:ring focus:ring-blue-200 ${
+                      isEditing ? "bg-white" : "bg-gray-50 text-gray-700"
+                    }`}
+                  />
+                </div>
               </div>
 
               <div>
                 <label
                   htmlFor="address"
-                  className="font-medium flex items-center gap-2"
+                  className="font-medium flex items-center gap-2 text-gray-700 mb-2"
                 >
-                  <MapPin size={16} /> Address
+                  <MapPin size={16} className="text-blue-600" /> Address
                 </label>
                 <input
                   id="address"
@@ -282,32 +349,16 @@ function ShopManagePage() {
                   disabled
                   value={shopAddress}
                   defaultValue={shopAddress}
-                  className="mt-2 w-full p-2 border rounded-lg"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="phone"
-                  className="font-medium flex items-center gap-2"
-                >
-                  <Phone size={16} /> Phone Number
-                </label>
-                <input
-                  disabled={!isEditing}
-                  id="phone"
-                  name="phone"
-                  defaultValue={shopPhone}
-                  className="mt-2 w-full p-2 border rounded-lg"
+                  className="w-full p-3 border rounded-lg bg-gray-50 text-gray-700"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="description"
-                  className="font-medium flex items-center gap-2"
+                  className="font-medium flex items-center gap-2 text-gray-700 mb-2"
                 >
-                  <FileText size={16} /> Description
+                  <FileText size={16} className="text-blue-600" /> Description
                 </label>
                 <textarea
                   disabled={!isEditing}
@@ -315,24 +366,26 @@ function ShopManagePage() {
                   name="description"
                   defaultValue={shopDescription}
                   rows={4}
-                  className="mt-2 w-full p-2 border rounded-lg resize-none"
+                  className={`w-full p-3 border rounded-lg resize-none focus:ring focus:ring-blue-200 ${
+                    isEditing ? "bg-white" : "bg-gray-50 text-gray-700"
+                  }`}
                 />
               </div>
-            </div>
-            {isEditing && (
-              <div className="flex justify-center">
-                <button
-                  type="submit"
-                  name="_action"
-                  value="updateShop"
-                  defaultValue="updateShop"
-                  className="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white flex items-center gap-2 cursor-pointer"
-                >
-                  <Save size={18} /> Save
-                </button>
-              </div>
-            )}
-          </fetcher.Form>
+
+              {isEditing && (
+                <div className="flex justify-center pt-4">
+                  <button
+                    type="submit"
+                    name="_action"
+                    value="updateShop"
+                    className="px-8 py-3 rounded-lg bg-green-600 hover:bg-green-700 text-white flex items-center gap-2 transition duration-200 shadow-md hover:shadow-lg"
+                  >
+                    <Save size={18} /> Save Changes
+                  </button>
+                </div>
+              )}
+            </fetcher.Form>
+          </div>
         </div>
       </div>
     </div>

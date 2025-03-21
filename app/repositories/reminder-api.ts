@@ -15,7 +15,6 @@ export async function fetchingShopReminders(shop_id: number, request: Request) {
         const response = await axios.get(`/shops/reminders/${shop_id}`);
 
         const reminders = response
-        console.log("Fetched Reminders:", reminders);
 
         if (!Array.isArray(reminders)) {
             console.error("Invalid reminder data format:", reminders);
@@ -44,7 +43,6 @@ export async function createShopReminder(request: Request, payload : ReminderPro
     try {
         const axios = useAxiosInstance(request);
         const response = await axios.post(`/shops/reminders`, payload)
-        console.log("Reminder created successfully:", response);
 
     } catch (e) {
         console.error("error creating reminder : ", e);
@@ -55,7 +53,6 @@ export async function markReminderAsDone(request: Request, reminder_id: number) 
     try {
         const axios = useAxiosInstance(request);
         const response = await axios.patch(`/shops/reminders/${reminder_id}`)
-        console.log("Reminder marked as done successfully:", response);
 
     } catch (e) {
         console.error("error marking reminder as done : ",

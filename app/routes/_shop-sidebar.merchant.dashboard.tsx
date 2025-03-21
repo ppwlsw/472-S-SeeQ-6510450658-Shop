@@ -42,7 +42,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
     console.error("Error fetching shop reminders:", e);
   }
 
-  console.log("Final Reminders in loader:", reminder_provider[shop_id]);
 
   return {
     shop: shop_provider[user_id] || null,
