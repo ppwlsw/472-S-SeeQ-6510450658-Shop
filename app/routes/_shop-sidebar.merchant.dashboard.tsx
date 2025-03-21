@@ -14,7 +14,7 @@ import {
 } from "recharts";
 import { Link, useLoaderData, useNavigate } from "react-router";
 import { redirect, type LoaderFunctionArgs } from "react-router";
-import { getAuthCookie } from "~/services/cookie";
+import { getAuthCookie } from "~/utils/cookie";
 import { reminder_provider, shop_provider } from "~/provider/provider";
 import { fetchingShopReminders } from "~/repositories/reminder-api";
 import { fetchingQueuesType } from "~/repositories/queues-api";

@@ -16,7 +16,7 @@ import {
   markReminderAsDone,
   type ReminderProp,
 } from "~/repositories/reminder-api";
-import { getAuthCookie } from "~/services/cookie";
+import { getAuthCookie } from "~/utils/cookie";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const data = await getAuthCookie({ request });

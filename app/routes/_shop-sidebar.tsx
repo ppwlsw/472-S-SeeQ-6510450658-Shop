@@ -6,7 +6,7 @@ import { redirect, useLoaderData, type LoaderFunctionArgs } from "react-router";
 
 import { shop_provider } from "~/provider/provider";
 import { fetchingShopData } from "~/repositories/shop-api";
-import { getAuthCookie } from "~/services/cookie";
+import { getAuthCookie } from "~/utils/cookie";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const data = await getAuthCookie({ request });

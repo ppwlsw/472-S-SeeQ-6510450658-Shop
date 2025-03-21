@@ -15,7 +15,7 @@ import {
   shop_provider,
 } from "~/provider/provider";
 import { createQueueType, fetchingQueuesType } from "~/repositories/queues-api";
-import { getAuthCookie } from "~/services/cookie";
+import { getAuthCookie } from "~/utils/cookie";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const data = await getAuthCookie({ request });

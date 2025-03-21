@@ -26,6 +26,8 @@ export async function requestLogin(
     body: formData,
   });
 
+  console.log(response);
+
   const json = await response.json();
    return {
     status: response.status,

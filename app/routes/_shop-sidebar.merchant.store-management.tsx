@@ -22,7 +22,7 @@ import {
   type ActionFunctionArgs,
 } from "react-router";
 import { shop_provider } from "~/provider/provider";
-import { authCookie } from "~/services/cookie";
+import { authCookie } from "~/utils/cookie";
 import {
   changeshopAvatar,
   changeShopOpenStatus,

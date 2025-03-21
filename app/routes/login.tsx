@@ -2,8 +2,8 @@ import { CircleX, Eye, EyeClosed, Store } from "lucide-react";
 import { useState } from "react";
 import { redirect, useFetcher, type ActionFunctionArgs } from "react-router";
 import Wave from "~/components/wave";
-import { requestDecryptToken, requestLogin } from "~/services/auth";
-import { authCookie, type AuthCookieProps } from "~/services/cookie";
+import { requestDecryptToken, requestLogin } from "~/utils/auth";
+import { authCookie, type AuthCookieProps } from "~/utils/cookie";
 import { motion } from "framer-motion";
 
 export async function action({ request }: ActionFunctionArgs) {
