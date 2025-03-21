@@ -148,7 +148,6 @@ export async function changeQueueStatus(request: Request, queue_id: number, stat
 
 
         const data = await response.json();
-        console.log("data in changeStatus", data);
         return data;
 
     } catch (error) {
