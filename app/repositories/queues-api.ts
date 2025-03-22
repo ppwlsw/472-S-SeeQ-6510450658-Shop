@@ -1,6 +1,7 @@
 import { setQueueProvider } from "~/provider/provider";
 import { useAuth } from "~/utils/auth";
 import useAxiosInstance from "~/utils/axiosInstance";
+import { prefetchImage } from "~/utils/image-proxy";
 
 export interface QueueType {
     id: number;
@@ -25,8 +26,10 @@ export interface QueueTypePayload {
 }
 
 export async function fetchingQueuesType(request: Request, shop_id: number) {
-    console.log("fetching queue types")
     try {
+        console.log(
+            "fetching queue types"
+        )
         const { getCookie } = useAuth
         const cookie = await getCookie({ request });
         const token = cookie.token;
@@ -62,8 +65,12 @@ export async function createQueueType(request: Request, payload: FormData) {
           },
           body: payload, 
         });
-    
-        console.log("Queue type created successfully:", await response.json());
+        const res = await response.json();
+        const image_url = await prefetchImage(res.data.image_url ?? "");
+        res.data.image_url = image_url;
+        console.log("res.data :", res.data);
+        setQueueProvider(res.data.shop_id, res.data);
+
 
     } catch (e) {
         console.error("error creating queue type : ", e);
@@ -115,7 +122,8 @@ export async function fetchCustomerInQueue(request: Request, shop_id: number) {
 
 export async function skipQueue(request : Request, queue_id: number ) {
     try {
-        const cookie = await getAuthCookie({ request });
+        const { getCookie } = useAuth;
+        const cookie = await getCookie({ request });
         const token = cookie.token;
         const response = await fetch(`http://laravel.test/api/queues/${queue_id}/cancel`, {
             headers: {

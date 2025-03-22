@@ -16,7 +16,6 @@ import { Link, useLoaderData, useNavigate } from "react-router";
 import { redirect, type LoaderFunctionArgs } from "react-router";
 import { reminder_provider, shop_provider } from "~/provider/provider";
 import { fetchingShopReminders } from "~/repositories/reminder-api";
-import { fetchingQueuesType } from "~/repositories/queues-api";
 import { useAuth } from "~/utils/auth";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -34,7 +33,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   try {
     await fetchingShopReminders(shop_id, request);
-    await fetchingQueuesType(request, shop_id);
   } catch (e) {
     console.error("Error fetching shop reminders:", e);
   }

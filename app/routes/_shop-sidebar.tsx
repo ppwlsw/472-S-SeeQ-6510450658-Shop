@@ -1,5 +1,12 @@
 import { Outlet, Link, useLocation } from "react-router";
-import { ChartSpline, UsersRound, Pencil, Bell, Store, LogOut } from "lucide-react";
+import {
+  ChartSpline,
+  UsersRound,
+  Pencil,
+  Bell,
+  Store,
+  LogOut,
+} from "lucide-react";
 import { SidebarItem } from "~/components/sidebar-item";
 
 import { redirect, useLoaderData, type LoaderFunctionArgs } from "react-router";
@@ -10,7 +17,7 @@ import { useAuth } from "~/utils/auth";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { getCookie, validate } = useAuth;
-  await validate( {request} );
+  await validate({ request });
   const data = await getCookie({ request });
   const user_id = data.user_id;
   const role = data.role;

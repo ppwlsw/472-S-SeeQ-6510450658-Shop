@@ -4,7 +4,7 @@ import { useNavigate } from "react-router";
 
 export default function QueueTypeCard({ queueType }: { queueType: QueueType }) {
   const navigate = useNavigate();
-
+  // console.log("QueueTypeCard", queueType);
   const handleClick = () => {
     navigate(`/merchant/queue/${queueType.id}`);
   };

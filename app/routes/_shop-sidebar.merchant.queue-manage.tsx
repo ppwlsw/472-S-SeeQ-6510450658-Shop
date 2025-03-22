@@ -11,7 +11,6 @@ import {
 import QueueTypeCard from "~/components/queue-type-card";
 import {
   queue_provider,
-  setQueueProvider,
   shop_provider,
 } from "~/provider/provider";
 import { createQueueType, fetchingQueuesType } from "~/repositories/queues-api";
@@ -24,7 +23,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const user_id = data.user_id;
   const shop_id = shop_provider[user_id]?.id;
   try {
-    const queueTypes = await fetchingQueuesType(request, shop_id);
+    await fetchingQueuesType(request, shop_id);
   } catch (e) {
     console.error(e);
   }
