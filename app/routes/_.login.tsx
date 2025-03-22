@@ -1,17 +1,27 @@
 import { CircleX, Eye, EyeClosed, Store } from "lucide-react";
 import { useState } from "react";
-import { redirect, useFetcher, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router";
+import {
+  redirect,
+  useFetcher,
+  type ActionFunctionArgs,
+  type LoaderFunctionArgs,
+} from "react-router";
 import Wave from "~/components/wave";
-import { authCookie, requestDecryptToken, requestLogin, useAuth } from "~/utils/auth";
+import {
+  authCookie,
+  requestDecryptToken,
+  requestLogin,
+  useAuth,
+} from "~/utils/auth";
 import { motion } from "framer-motion";
 import { fetchingShopData } from "~/repositories/shop-api";
 import LoadingIndicator from "~/components/loading-indicator";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const  { getCookie } = useAuth;
-  const existCookie = await getCookie( {request} );
+  const { getCookie } = useAuth;
+  const existCookie = await getCookie({ request });
   if (existCookie) {
-    throw redirect("/merchant/dashboard")
+    throw redirect("/merchant/dashboard");
   }
 }
 
