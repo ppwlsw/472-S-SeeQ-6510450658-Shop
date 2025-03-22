@@ -25,6 +25,7 @@ export interface QueueTypePayload {
 }
 
 export async function fetchingQueuesType(request: Request, shop_id: number) {
+    console.log("fetching queue types")
     try {
 
         const cookie = await getAuthCookie({ request });

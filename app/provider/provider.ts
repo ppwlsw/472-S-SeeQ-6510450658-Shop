@@ -48,6 +48,7 @@ let queue_provider: Record<number, QueueType[]> = {};
 
 function setShopProvider(user_id: number, shop: Shop) {
   shop_provider[user_id] = shop;
+  console.log("set shop_provider", shop_provider[user_id]);
 }
 
 function updateShopOpenStatus(user_id: number) {
@@ -63,6 +64,7 @@ function setShopReminder(shop_id: number, reminder: Reminder) {
 
 function setQueueProvider(shop_id: number, queueTypes: QueueType[]) {
   queue_provider[shop_id] = queueTypes;
+  console.log("set queue_provider", queue_provider);
 }
 
 export { shop_provider, reminder_provider, queue_provider};

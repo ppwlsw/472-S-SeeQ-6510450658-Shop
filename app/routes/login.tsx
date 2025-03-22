@@ -5,6 +5,8 @@ import Wave from "~/components/wave";
 import { requestDecryptToken, requestLogin } from "~/utils/auth";
 import { authCookie, type AuthCookieProps } from "~/utils/cookie";
 import { motion } from "framer-motion";
+import { fetchingShopData } from "~/repositories/shop-api";
+import LoadingIndicator from "~/components/loading-indicator";
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
@@ -17,7 +19,7 @@ export async function action({ request }: ActionFunctionArgs) {
   if (action === "default_login") {
     formData.set("email", (formData.get("email") as string).toLowerCase());
     const error = validateInput(formData);
-    
+
     if (error) {
       return error;
     }
@@ -28,7 +30,6 @@ export async function action({ request }: ActionFunctionArgs) {
     });
 
     if (response.status !== 201) {
-
       return {
         message: "",
         error: response.error,
@@ -44,19 +45,19 @@ export async function action({ request }: ActionFunctionArgs) {
       };
     }
 
-
-
-
     const token: string = response.data.token;
     const user_id: number = response.data.id;
     const role: string = response.data.role;
 
-    const decrypted = (await requestDecryptToken(token)).data.plain_text as string;
+    const decrypted = (await requestDecryptToken(token)).data
+      .plain_text as string;
     const cookie = await authCookie.serialize({
       token: decrypted,
       user_id: user_id,
       role: role,
     } as AuthCookieProps);
+
+    await fetchingShopData(user_id, request);
 
     return redirect("/merchant/dashboard", {
       headers: {
@@ -177,7 +178,7 @@ function LoginFetcherForm() {
   );
 }
 
-function LoginModal({ fetcherKey }: {fetcherKey: string}) {
+function LoginModal({ fetcherKey }: { fetcherKey: string }) {
   const fetcher = useFetcher<ActionMessage>({
     key: fetcherKey,
   });
@@ -225,18 +226,20 @@ function LoginModal({ fetcherKey }: {fetcherKey: string}) {
             <CircleX size={36} color="#F44336" />
           </motion.div>
         )}
-        <motion.p
-          animate={{
-            opacity: 1,
-            color: fetcher.data?.error != undefined ? "#F44336" : "#0b1215",
-            transition: { duration: 0.3, ease: "easeIn" },
-          }}
-          className="text-xl text-obsidian"
-        >
-          {fetcher.data?.error != undefined
-            ? fetcher.data.error
-            : "กำลังโหลด..."}
-        </motion.p>
+        <LoadingIndicator
+          icon={fetcher.data?.error ? CircleX : undefined}
+          message={
+            fetcher.data?.error != undefined
+              ? fetcher.data.error
+              : fetcher.state === "submitting" &&
+                fetcher.formData?.get("_action") === "default_login"
+              ? "กำลังโหลดข้อมูลร้านค้า..."
+              : "กำลังโหลด..."
+          }
+          isLoading={!fetcher.data?.error}
+          iconColor="#F44336"
+          className="shadow-lg absolute"
+        />
       </div>
     </motion.div>
   );
@@ -257,11 +260,15 @@ export default function Login() {
           </div>
           <div className="flex flex-col justify-center max-lg:h-3/5 w-full lg:border-l-[0.1px] border-gray-300 p-10 pt-0 pb-0 lg:gap-8">
             <p className="flex flex-row items-center text-4xl">
-              <span className="border-t-4 border-nature-blue pt-2">เข้าสู่ระบบ</span>
-              <span className="border-t-4 border-white-smoke pt-2">ร้านค้า</span>
+              <span className="border-t-4 border-nature-blue pt-2">
+                เข้าสู่ระบบ
+              </span>
+              <span className="border-t-4 border-white-smoke pt-2">
+                ร้านค้า
+              </span>
               <div className="border-t-4 border-white-smoke pt-2">
                 <Store size={36} />
-              </div> 
+              </div>
             </p>
             <div className="w-full mt-8">
               <LoginFetcherForm />
@@ -276,8 +283,7 @@ export default function Login() {
       </div>
 
       {/* Loading */}
-      <LoginModal fetcherKey="LoginFetcher"/>
-
+      <LoginModal fetcherKey="LoginFetcher" />
     </div>
   );
 }

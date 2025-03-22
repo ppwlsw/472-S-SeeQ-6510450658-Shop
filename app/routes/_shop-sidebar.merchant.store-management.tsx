@@ -193,13 +193,6 @@ function ShopManagePage() {
                 {shop.is_open ? "Close Shop" : "Open Shop"}
               </button>
             </fetcher.Form>
-
-            <button
-              className="bg-gray-100 hover:bg-gray-200 p-2 rounded-full text-gray-700"
-              title="Sign Out"
-            >
-              <LogOut size={20} />
-            </button>
           </div>
         </div>
       </div>

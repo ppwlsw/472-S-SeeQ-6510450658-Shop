@@ -36,12 +36,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   try {
     await fetchingShopReminders(shop_id, request);
-    const queueTypes = await fetchingQueuesType(request, shop_id);
-    
+    await fetchingQueuesType(request, shop_id);
   } catch (e) {
     console.error("Error fetching shop reminders:", e);
   }
-
 
   return {
     shop: shop_provider[user_id] || null,
