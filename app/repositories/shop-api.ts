@@ -30,17 +30,18 @@ export async function changeShopOpenStatus(shop_id : number, request: Request){
     const response = await axios.put(`shops/${shop_id}/is-open`);
     const cookie = request.headers.get("Cookie");
     const data = await authCookie.parse(cookie);
-    var user_id = data.user_id;
+    let user_id = data.user_id;
     updateShopOpenStatus(user_id);
+    return {
+      "code": 200,
+      "data": "Shop status changed successfully",
+      "shop": shop_provider[user_id]
+    }
 
   } catch (error) {
     console.error(error);
   }
-  return {
-    "code": 200,
-    "data": "Shop status changed successfully",
-    "shop": shop_provider[user_id]
-  }
+  
 }
 
 export async function updateShop(shop_id : number, updateRequest : UpdateShopRequest, request : Request){

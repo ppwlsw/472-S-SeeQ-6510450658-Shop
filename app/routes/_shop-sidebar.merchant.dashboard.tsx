@@ -65,7 +65,7 @@ function DashboardPage() {
       date: "Feb 28, 2025",
       table: "T-5",
       capacity: "4",
-      status: "Pending",
+      status: "waiting",
       phone: "123-456-7890",
     },
     {
@@ -75,7 +75,7 @@ function DashboardPage() {
       date: "Feb 28, 2025",
       table: "T-12",
       capacity: "2",
-      status: "Completed",
+      status: "completed",
       phone: "987-654-3210",
     },
     {
@@ -85,7 +85,7 @@ function DashboardPage() {
       date: "Feb 28, 2025",
       table: "T-8",
       capacity: "6",
-      status: "Completed",
+      status: "completed",
       phone: "555-678-1234",
     },
     {
@@ -95,7 +95,7 @@ function DashboardPage() {
       date: "Feb 28, 2025",
       table: "T-3",
       capacity: "3",
-      status: "Canceled",
+      status: "canceled",
       phone: "111-222-3333",
     },
   ];

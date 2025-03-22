@@ -66,17 +66,19 @@ function QueueTypeManagePage() {
         </button>
       </div>
 
-      {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold">Create Queue Type</h2>
+        <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50 transition-all duration-300">
+          <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center mb-6 border-b border-gray-100 pb-3">
+              <h2 className="text-xl font-semibold text-gray-800">
+                Create Queue Type
+              </h2>
               <button
                 onClick={() => {
                   setIsModalOpen(false);
                   revalidator.revalidate();
                 }}
+                className="text-gray-500 hover:text-gray-900 transition-colors duration-200"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -85,7 +87,7 @@ function QueueTypeManagePage() {
             <fetcher.Form
               method="POST"
               encType="multipart/form-data"
-              className="space-y-4"
+              className="space-y-5"
               onSubmit={() => setIsModalOpen(false)}
             >
               <input
@@ -94,77 +96,100 @@ function QueueTypeManagePage() {
                 value={shop_id}
                 className="hidden"
               />
+
               {/* Image Upload */}
-              <div>
-                <label className="block text-sm font-medium">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
                   Upload Image
                 </label>
-                <input
-                  type="file"
-                  name="image"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      setPreviewImage(URL.createObjectURL(file));
-                    }
-                  }}
-                  className="w-full p-2 border border-gray-300 rounded"
-                />
-                {/* Image Preview */}
-                {previewImage && (
-                  <div className="mt-2">
-                    <img
-                      src={previewImage}
-                      alt="Preview"
-                      className="w-full h-32 object-cover rounded border border-gray-200"
-                    />
-                  </div>
-                )}
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-gray-400 transition-colors duration-200">
+                  <input
+                    type="file"
+                    name="image"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setPreviewImage(URL.createObjectURL(file));
+                      }
+                    }}
+                    className="hidden"
+                    id="file-upload"
+                  />
+                  <label htmlFor="file-upload" className="cursor-pointer">
+                    {!previewImage ? (
+                      <div className="space-y-2">
+                        <div className="mx-auto w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+                          <Plus className="w-6 h-6 text-gray-600" />
+                        </div>
+                        <p className="text-sm text-gray-500">
+                          Click to upload or drag and drop
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          PNG, JPG, GIF up to 10MB
+                        </p>
+                      </div>
+                    ) : (
+                      <img
+                        src={previewImage}
+                        alt="Preview"
+                        className="w-full h-40 object-cover rounded border border-gray-200"
+                      />
+                    )}
+                  </label>
+                </div>
               </div>
 
               {/* Name */}
-              <div>
-                <label className="block text-sm font-medium">Name</label>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Name
+                </label>
                 <input
                   type="text"
                   name="name"
                   required
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-black focus:border-black transition duration-200"
+                  placeholder="Enter queue type name"
                 />
               </div>
 
               {/* Description */}
-              <div>
-                <label className="block text-sm font-medium">Description</label>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Description
+                </label>
                 <textarea
                   name="description"
                   rows={3}
                   required
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-black focus:border-black transition duration-200"
+                  placeholder="Describe this queue type"
                 ></textarea>
               </div>
 
               {/* Tag */}
-              <div>
-                <label className="block text-sm font-medium">Tag</label>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Tag
+                </label>
                 <input
-                  maxLength={3}
                   type="text"
                   name="tag"
                   required
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-black focus:border-black transition duration-200"
+                  placeholder="Add a tag (e.g., 'VIP', 'Standard')"
                 />
               </div>
 
               {/* Availability */}
-              <div>
-                <label className="block text-sm font-medium">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
                   Availability
                 </label>
                 <select
                   name="is_available"
                   required
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-black focus:border-black transition duration-200 bg-white"
                 >
                   <option value="true">Available</option>
                   <option value="false">Not Available</option>
@@ -172,10 +197,10 @@ function QueueTypeManagePage() {
               </div>
 
               {/* Buttons */}
-              <div className="flex justify-end space-x-2">
+              <div className="flex justify-end space-x-3 pt-4 mt-6 border-t border-gray-100">
                 <button
                   type="button"
-                  className="px-4 py-2 bg-gray-300 rounded"
+                  className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-md transition duration-200 font-medium text-gray-700"
                   onClick={() => setIsModalOpen(false)}
                 >
                   Cancel
@@ -184,7 +209,7 @@ function QueueTypeManagePage() {
                   name="_action"
                   value="createQueueType"
                   type="submit"
-                  className="px-4 py-2 bg-black text-white rounded"
+                  className="px-5 py-2.5 bg-black text-white rounded-md hover:bg-gray-800 transition duration-200 font-medium shadow-sm"
                 >
                   Create
                 </button>

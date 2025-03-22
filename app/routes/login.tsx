@@ -226,20 +226,23 @@ function LoginModal({ fetcherKey }: { fetcherKey: string }) {
             <CircleX size={36} color="#F44336" />
           </motion.div>
         )}
-        <LoadingIndicator
-          icon={fetcher.data?.error ? CircleX : undefined}
-          message={
-            fetcher.data?.error != undefined
-              ? fetcher.data.error
-              : fetcher.state === "submitting" &&
-                fetcher.formData?.get("_action") === "default_login"
-              ? "กำลังโหลดข้อมูลร้านค้า..."
-              : "กำลังโหลด..."
-          }
-          isLoading={!fetcher.data?.error}
-          iconColor="#F44336"
-          className="shadow-lg absolute"
-        />
+        <motion.p
+          animate={{
+            opacity: 1,
+            color: fetcher.data?.error != undefined ? "#F44336" : "#0b1215",
+            transition: { duration: 0.3, ease: "easeIn" },
+          }}
+          className="text-xl text-obsidian"
+        >
+          {fetcher.data?.error != undefined ? (
+            fetcher.data.error
+          ) : fetcher.state === "submitting" &&
+            fetcher.formData?.get("_action") === "default_login" ? (
+            <LoadingIndicator message={"กำลังโหลดข้อมูลร้านค้า..."} />
+          ) : (
+            "กำลังโหลด..."
+          )}
+        </motion.p>
       </div>
     </motion.div>
   );

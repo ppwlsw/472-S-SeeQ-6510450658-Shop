@@ -10,12 +10,16 @@ import ReservationCard from "~/components/reservation-card";
 import {
   changeQueueStatus,
   fetchCustomerInQueue,
+  fetchingQueuesType,
   fetchQueueDetail,
   nextQueue,
+  skipQueue,
 } from "~/repositories/queues-api";
 import { getAuthCookie } from "~/utils/cookie";
 import Swal from "sweetalert2";
 import { useEffect } from "react";
+import { ArrowRightCircle, ChevronLast, SkipForward } from "lucide-react";
+import { shop_provider } from "~/provider/provider";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const data = await getAuthCookie({ request });
@@ -36,6 +40,8 @@ export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const action = formData.get("_action");
   const queue_id = parseInt(formData.get("queue_id") as string);
+  const user_id = (await getAuthCookie({ request })).user_id;
+  const shop_id = shop_provider[user_id].id;
   if (!queue_id) return;
 
   let result = { success: false, message: "" };
@@ -52,6 +58,21 @@ export async function action({ request }: ActionFunctionArgs) {
         result = {
           success: false,
           message: "ไม่สามารถเรียกคิวถัดไปได้",
+        };
+      }
+      break;
+    case "skipQueue":
+      try {
+        await skipQueue(request, queue_id);
+        await fetchingQueuesType(request, shop_id);
+        result = {
+          success: true,
+          message: "ข้ามคิวสำเร็จ",
+        };
+      } catch (e) {
+        result = {
+          success: false,
+          message: "ไม่สามารถข้ามคิวได้",
         };
       }
       break;
@@ -117,7 +138,7 @@ function QueueManagePage() {
     navigate(-1);
   };
 
-  const handleNextQueue = (e: any) => {
+  const handleNextQueue = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
     Swal.fire({
@@ -129,6 +150,36 @@ function QueueManagePage() {
       cancelButtonColor: "#d33",
       confirmButtonText: "ใช่, เรียกคิวถัดไป!",
       cancelButtonText: "ยกเลิก",
+      customClass: {
+        confirmButton: "order-2",
+        cancelButton: "order-1",
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const formData = new FormData();
+        formData.append("queue_id", queueDetail?.id);
+        formData.append("_action", "nextQueue");
+        fetcher.submit(formData, { method: "post" });
+      }
+    });
+  };
+
+  const handleSkipQueue = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
+    Swal.fire({
+      title: "ข้ามคิวนี้?",
+      text: "คุณต้องการข้ามคิวนี้ใช่หรือไม่?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "ใช่, ข้ามคิวนี้!",
+      cancelButtonText: "ยกเลิก",
+      customClass: {
+        confirmButton: "order-2",
+        cancelButton: "order-1",
+      },
     }).then((result) => {
       if (result.isConfirmed) {
         const formData = new FormData();
@@ -292,7 +343,7 @@ function QueueManagePage() {
                   id={item.id}
                   name={item.user_name}
                   table={`${item.name}`}
-                  status={item.is_available ? "Available" : "Unavailable"}
+                  status={item.status}
                   phone={item.user_phone}
                 />
               </div>
@@ -330,27 +381,29 @@ function QueueManagePage() {
       </div>
 
       {/* Bottom Right Buttons */}
-      <div className="fixed bottom-4 right-4 flex gap-4">
+      <div className="fixed bottom-6 right-6 flex gap-3 z-10">
+        <button
+          onClick={handleSkipQueue}
+          className="px-5 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-all duration-300 
+              shadow-lg flex items-center justify-center gap-2 transform hover:scale-102 active:scale-95 min-w-32"
+        >
+          <SkipForward className="w-5 h-5" />
+          <span>ข้ามคิวนี้</span>
+        </button>
+
         <button
           onClick={handleNextQueue}
-          className="p-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all duration-300 
-                    shadow-lg flex items-center transform hover:scale-105 active:scale-95"
+          className="px-5 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all duration-300 
+              shadow-lg flex items-center justify-center gap-2 transform hover:scale-102 active:scale-95 min-w-32
+              relative overflow-hidden group"
         >
-          <svg
-            className="w-5 h-5 mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M9 5l7 7-7 7"
-            ></path>
-          </svg>
-          เรียกคิวนี้
+          <div
+            className="absolute inset-0 w-full h-full transition-all duration-300 
+                  scale-x-0 translate-x-0 group-hover:scale-x-100 group-hover:translate-x-0 
+                  origin-left bg-blue-600 z-0"
+          ></div>
+          <ArrowRightCircle className="w-5 h-5 relative z-10" />
+          <span className="relative z-10">เรียกคิวนี้</span>
         </button>
       </div>
     </div>

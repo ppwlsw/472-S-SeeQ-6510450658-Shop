@@ -111,6 +111,25 @@ export async function fetchCustomerInQueue(request: Request, shop_id: number) {
     }
 }
 
+export async function skipQueue(request : Request, queue_id: number ) {
+    try {
+        const cookie = await getAuthCookie({ request });
+        const token = cookie.token;
+        const response = await fetch(`http://laravel.test/api/queues/${queue_id}/cancel`, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+            },
+            method : "POST"
+        });
+
+        const data = await response.json();
+        return data;
+
+    } catch (error) {
+        console.error("Error fetching queue types:", error);
+        return { code: 500, data: [] };
+    }
+}
 export async function nextQueue(request : Request, queue_id: number ) {
     try {
         const cookie = await getAuthCookie({ request });

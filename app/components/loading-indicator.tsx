@@ -55,7 +55,7 @@ const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
       onClick={onClick}
     >
       {isLoading ? (
-        <span className="inline-block w-[20px] h-[20px] border-4 border-gray-400 rounded-full border-t-white-smoke animate-spin"></span>
+        <span className="inline-block  border-4 border-gray-400 rounded-full border-t-white-smoke animate-spin"></span>
       ) : Icon ? (
         <motion.div
           initial={{ rotate: 90 }}
