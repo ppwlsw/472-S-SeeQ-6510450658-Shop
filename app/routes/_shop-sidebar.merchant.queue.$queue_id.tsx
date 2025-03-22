@@ -13,13 +13,11 @@ import {
   fetchQueueDetail,
   nextQueue,
 } from "~/repositories/queues-api";
-import { getAuthCookie } from "~/utils/cookie";
 import Swal from "sweetalert2";
 import { useEffect } from "react";
+import { useAuth } from "~/utils/auth";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const data = await getAuthCookie({ request });
-  if (!data) return redirect("/login");
   const queue_id = parseInt(params.queue_id as string);
   try {
     var inQueues = await fetchCustomerInQueue(request, queue_id);

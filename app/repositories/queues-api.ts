@@ -1,5 +1,5 @@
 import { setQueueProvider } from "~/provider/provider";
-import { authCookie, getAuthCookie } from "~/utils/cookie";
+import { useAuth } from "~/utils/auth";
 import useAxiosInstance from "~/utils/axiosInstance";
 
 export interface QueueType {
@@ -26,8 +26,8 @@ export interface QueueTypePayload {
 
 export async function fetchingQueuesType(request: Request, shop_id: number) {
     try {
-
-        const cookie = await getAuthCookie({ request });
+        const { getCookie } = useAuth
+        const cookie = await getCookie({ request });
         const token = cookie.token;
         const response = await fetch(`http://laravel.test/api/queues?shop_id=${shop_id}`, {
             headers: {
@@ -51,8 +51,8 @@ export async function fetchingQueuesType(request: Request, shop_id: number) {
 export async function createQueueType(request: Request, payload: FormData) {
     console.log("payload", payload);
     try {
-        const cookie = request.headers.get("cookie");
-        const data = await authCookie.parse(cookie);
+        const { getCookie } = useAuth;
+        const data = await getCookie({ request });
         const token = data.token;
         const response = await fetch(`${process.env.APP_URL}/queues`, {
           method: "POST",
@@ -71,7 +71,8 @@ export async function createQueueType(request: Request, payload: FormData) {
 
 export async function fetchQueueDetail(request: Request, queue_id: number) {
     try {
-        const cookie = await getAuthCookie({ request });
+        const { getCookie } = useAuth;
+        const cookie = await getCookie({ request });
         const token = cookie.token;
         const response = await fetch(`http://laravel.test/api/queues/${queue_id}`, {
             headers: {
@@ -91,7 +92,8 @@ export async function fetchQueueDetail(request: Request, queue_id: number) {
 
 export async function fetchCustomerInQueue(request: Request, shop_id: number) {
     try {
-        const cookie = await getAuthCookie({ request });
+        const { getCookie } = useAuth;
+        const cookie = await getCookie({ request });
         const token = cookie.token;
         const response = await fetch(`http://laravel.test/api/queues/${shop_id}/getAllQueue`, {
             headers: {
@@ -112,7 +114,8 @@ export async function fetchCustomerInQueue(request: Request, shop_id: number) {
 
 export async function nextQueue(request : Request, queue_id: number ) {
     try {
-        const cookie = await getAuthCookie({ request });
+        const { getCookie } = useAuth;
+        const cookie = await getCookie({ request });
         const token = cookie.token;
         const response = await fetch(`http://laravel.test/api/queues/${queue_id}/next`, {
             headers: {
@@ -132,8 +135,8 @@ export async function nextQueue(request : Request, queue_id: number ) {
 
 export async function changeQueueStatus(request: Request, queue_id: number, status: boolean) {
     try {
-    
-        const cookie = await getAuthCookie({ request });
+        const { getCookie } = useAuth;
+        const cookie = await getCookie({ request });
         const token = cookie.token;
         const response = await fetch(`http://laravel.test/api/queues/${queue_id}`, {
             headers: {
