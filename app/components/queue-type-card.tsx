@@ -9,8 +9,6 @@ export default function QueueTypeCard({ queueType }: { queueType: QueueType }) {
     navigate(`/merchant/queue/${queueType.id}`);
   };
 
-  console.log("Queue Type Card", queueType);
-
   return (
     <div
       onClick={handleClick}
