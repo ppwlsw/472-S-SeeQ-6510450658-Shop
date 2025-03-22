@@ -1,15 +1,17 @@
 import { Outlet, Link, useLocation } from "react-router";
-import { ChartSpline, UsersRound, Pencil, Bell, Store } from "lucide-react";
+import { ChartSpline, UsersRound, Pencil, Bell, Store, LogOut } from "lucide-react";
 import { SidebarItem } from "~/components/sidebar-item";
 
 import { redirect, useLoaderData, type LoaderFunctionArgs } from "react-router";
 
 import { shop_provider } from "~/provider/provider";
 import { fetchingShopData } from "~/repositories/shop-api";
-import { getAuthCookie } from "~/utils/cookie";
+import { useAuth } from "~/utils/auth";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const data = await getAuthCookie({ request });
+  const { getCookie, validate } = useAuth;
+  await validate( {request} );
+  const data = await getCookie({ request });
   const user_id = data.user_id;
   const role = data.role;
 
@@ -91,6 +93,11 @@ const MerchantNav = () => {
               icon={<Pencil className="w-5 h-5" />}
               label="จัดการร้านค้า"
               paths={["/merchant/store-management"]}
+            />
+            <SidebarItem
+              icon={<LogOut className="w-5 h-5" />}
+              label="ออกจากระบบ"
+              paths={["/logout"]}
             />
           </div>
         </section>

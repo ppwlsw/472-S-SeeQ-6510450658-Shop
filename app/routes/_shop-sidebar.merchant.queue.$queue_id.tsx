@@ -15,15 +15,13 @@ import {
   nextQueue,
   skipQueue,
 } from "~/repositories/queues-api";
-import { getAuthCookie } from "~/utils/cookie";
 import Swal from "sweetalert2";
 import { useEffect } from "react";
+import { useAuth } from "~/utils/auth";
 import { ArrowRightCircle, ChevronLast, SkipForward } from "lucide-react";
 import { shop_provider } from "~/provider/provider";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const data = await getAuthCookie({ request });
-  if (!data) return redirect("/login");
   const queue_id = parseInt(params.queue_id as string);
   try {
     var inQueues = await fetchCustomerInQueue(request, queue_id);
@@ -40,8 +38,11 @@ export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const action = formData.get("_action");
   const queue_id = parseInt(formData.get("queue_id") as string);
-  const user_id = (await getAuthCookie({ request })).user_id;
-  const shop_id = shop_provider[user_id].id;
+  const { getCookie } = useAuth;
+  const data = await getCookie({ request });
+  const user_id = shop_provider[data.user_id]?.id;
+  const shop_id = shop_provider[user_id]?.id;
+
   if (!queue_id) return;
 
   let result = { success: false, message: "" };

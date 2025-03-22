@@ -14,17 +14,15 @@ import {
 } from "recharts";
 import { Link, useLoaderData, useNavigate } from "react-router";
 import { redirect, type LoaderFunctionArgs } from "react-router";
-import { getAuthCookie } from "~/utils/cookie";
 import { reminder_provider, shop_provider } from "~/provider/provider";
 import { fetchingShopReminders } from "~/repositories/reminder-api";
 import { fetchingQueuesType } from "~/repositories/queues-api";
+import { useAuth } from "~/utils/auth";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const data = await getAuthCookie({ request });
+  const { getCookie } = useAuth;
+  const data = await getCookie({ request });
 
-  if (!data) {
-    return redirect("/login");
-  }
 
   const user_id = data.user_id;
   const shop_id = shop_provider[user_id]?.id;

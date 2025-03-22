@@ -1,12 +1,29 @@
 import { CircleX, Eye, EyeClosed, Store } from "lucide-react";
 import { useState } from "react";
-import { redirect, useFetcher, type ActionFunctionArgs } from "react-router";
+import {
+  redirect,
+  useFetcher,
+  type ActionFunctionArgs,
+  type LoaderFunctionArgs,
+} from "react-router";
 import Wave from "~/components/wave";
-import { requestDecryptToken, requestLogin } from "~/utils/auth";
-import { authCookie, type AuthCookieProps } from "~/utils/cookie";
+import {
+  authCookie,
+  requestDecryptToken,
+  requestLogin,
+  useAuth,
+} from "~/utils/auth";
 import { motion } from "framer-motion";
 import { fetchingShopData } from "~/repositories/shop-api";
 import LoadingIndicator from "~/components/loading-indicator";
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const { getCookie } = useAuth;
+  const existCookie = await getCookie({ request });
+  if (existCookie) {
+    throw redirect("/merchant/dashboard");
+  }
+}
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
@@ -55,7 +72,7 @@ export async function action({ request }: ActionFunctionArgs) {
       token: decrypted,
       user_id: user_id,
       role: role,
-    } as AuthCookieProps);
+    });
 
     await fetchingShopData(user_id, request);
 

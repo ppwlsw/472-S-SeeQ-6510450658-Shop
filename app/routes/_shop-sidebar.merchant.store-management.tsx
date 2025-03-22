@@ -22,7 +22,6 @@ import {
   type ActionFunctionArgs,
 } from "react-router";
 import { shop_provider } from "~/provider/provider";
-import { authCookie } from "~/utils/cookie";
 import {
   changeshopAvatar,
   changeShopOpenStatus,
@@ -32,14 +31,11 @@ import {
 } from "~/repositories/shop-api";
 import Swal from "sweetalert2";
 import { ChangePasswordModal } from "~/components/change-password-modal";
+import { useAuth } from "~/utils/auth";
 
 export async function loader({ request }: ActionFunctionArgs) {
-  const cookie = request.headers.get("cookie");
-  const data = await authCookie.parse(cookie);
-
-  if (!data) {
-    return redirect("/login");
-  }
+  const { getCookie } = useAuth;
+  const data = await getCookie({ request });
 
   const user_id = data.user_id;
   const shop = shop_provider[user_id];
@@ -54,12 +50,9 @@ export async function loader({ request }: ActionFunctionArgs) {
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const action = formData.get("_action");
-  const cookie = request.headers.get("cookie");
-  const data = await authCookie.parse(cookie);
+  const { getCookie } = useAuth;
+  const data = await getCookie({ request });
 
-  if (!data) {
-    return redirect("/login");
-  }
   const user_id = data.user_id;
   const shop_id = shop_provider[user_id].id;
   const shop = shop_provider[user_id];

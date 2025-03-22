@@ -15,6 +15,7 @@ type Params = {
   "/merchant/queue-manage": {};
   "/merchant/reminders": {};
   "/merchant/dashboard": {};
+  "/logout": {};
   "/login": {};
   "/home": {};
 };

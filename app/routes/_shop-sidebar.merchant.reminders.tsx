@@ -16,13 +16,11 @@ import {
   markReminderAsDone,
   type ReminderProp,
 } from "~/repositories/reminder-api";
-import { getAuthCookie } from "~/utils/cookie";
+import { useAuth } from "~/utils/auth";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const data = await getAuthCookie({ request });
-  if (!data) {
-    return redirect("/login");
-  }
+  const { getCookie } = useAuth;
+  const data = await getCookie({ request });
   const user_id = data.user_id;
   const shop_id = shop_provider[user_id]?.id;
   if (!shop_id) {
@@ -41,11 +39,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const action = formData.get("_action");
-  const data = await getAuthCookie({ request });
-
-  if (!data) {
-    return redirect("/login");
-  }
+  const { getCookie } = useAuth;
+  const data = await getCookie({ request });
 
   switch (action) {
     case "createReminder":

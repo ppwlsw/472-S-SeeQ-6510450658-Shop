@@ -1,3 +1,5 @@
+import { prefetchImage } from "~/utils/image-proxy";
+
 interface Shop {
   id: number;
   name: string;
@@ -46,7 +48,9 @@ let reminder_provider: Record<number, Reminder[]> = {};
 
 let queue_provider: Record<number, QueueType[]> = {};
 
-function setShopProvider(user_id: number, shop: Shop) {
+async function setShopProvider(user_id: number, shop: Shop) {
+  const image_url = await prefetchImage(shop.image_url ?? "");
+  shop.image_url = image_url
   shop_provider[user_id] = shop;
   console.log("set shop_provider", shop_provider[user_id]);
 }
