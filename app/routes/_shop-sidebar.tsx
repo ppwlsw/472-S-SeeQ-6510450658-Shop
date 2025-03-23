@@ -14,6 +14,8 @@ import { redirect, useLoaderData, type LoaderFunctionArgs } from "react-router";
 import { shop_provider } from "~/provider/provider";
 import { fetchingShopData } from "~/repositories/shop-api";
 import { useAuth } from "~/utils/auth";
+import { useState } from "react";
+import { LogoutModal } from "~/components/logout-modal";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { getCookie, validate } = useAuth;
@@ -53,7 +55,8 @@ const MerchantNav = () => {
   };
 
   const { shop } = useLoaderData<typeof loader>();
-
+  const [isPoping, setIsPoping] = useState<boolean>(false);
+  console.log(isPoping);
   return (
     <div className="flex flex-row h-screen">
       {/* Sidebar */}
@@ -90,7 +93,7 @@ const MerchantNav = () => {
             </div>
           </div>
 
-          <div className="flex flex-col mb-4">
+          <div className="flex flex-col mb-4 gap-3">
             <label htmlFor="manage-store">
               <h1 className="mx-2 mt-4 p-4 font-bold text-gray-500 border-b-[1px] border-gray-200 mb-4">
                 Setting
@@ -101,11 +104,12 @@ const MerchantNav = () => {
               label="จัดการร้านค้า"
               paths={["/merchant/store-management"]}
             />
-            <SidebarItem
-              icon={<LogOut className="w-5 h-5" />}
-              label="ออกจากระบบ"
-              paths={["/logout"]}
-            />
+            <LogoutModal isPoping={isPoping} setIsPoping={ setIsPoping }/>
+            <button className="flex flex-row justify-start items-center px-6 py-2 mx-4 gap-4 border-[1px] border-transparent hover:text-red-600 hover:border-red-600 hover:scale-105 duration-300 rounded-md"
+            onClick={ () => { setIsPoping(true) }}>
+              <LogOut className="w-5 h-5" />
+              <p>ออกจากระบบ</p>
+            </button>
           </div>
         </section>
       </nav>
