@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import ReservationCard from "~/components/reservation-card";
 import StatCard from "~/components/stat-card";
 import ReminderCard from "~/components/reminder-card";
@@ -5,121 +6,114 @@ import { CalendarCheck, Clock, Users, XCircle } from "lucide-react";
 import {
   BarChart,
   Bar,
-  Rectangle,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Legend,
 } from "recharts";
 import { Link, useLoaderData, useNavigate } from "react-router";
-import { redirect, type LoaderFunctionArgs } from "react-router";
+import { type LoaderFunctionArgs } from "react-router";
 import { reminder_provider, shop_provider } from "~/provider/provider";
 import { fetchingShopReminders } from "~/repositories/reminder-api";
 import { useAuth } from "~/utils/auth";
+import { fetchShopStat } from "~/repositories/shop-api";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { getCookie } = useAuth;
   const data = await getCookie({ request });
 
-
   const user_id = data.user_id;
   const shop_id = shop_provider[user_id]?.id;
 
   if (!shop_id) {
-    console.error("Shop ID is undefined");
-    return { shop: null, reminders: [] };
+    return {
+      shop: null,
+      reminders: [],
+      stats: null,
+      user_in_queues: [],
+      shop_id: null,
+    };
   }
 
   try {
     await fetchingShopReminders(shop_id, request);
+    const stats = await fetchShopStat(shop_id, request);
+
+    return {
+      shop: shop_provider[user_id] || null,
+      reminders: reminder_provider[shop_id] || [],
+      stats: stats?.shop_stat || null,
+      user_in_queues: stats?.users_in_queues || [],
+      shop_id: shop_id,
+    };
   } catch (e) {
     console.error("Error fetching shop reminders:", e);
   }
 
   return {
     shop: shop_provider[user_id] || null,
-    reminders: reminder_provider[shop_id] || [], // Ensure it's an array
+    reminders: reminder_provider[shop_id] || [],
+    stats: null,
+    user_in_queues: [],
+    shop_id: shop_id,
   };
 }
 
+// Mock Stacked Bar Chart Data
+const mockChartData = [
+  { name: "Mon", waiting: 20, completed: 25, canceled: 5, date: "2025-03-17" },
+  { name: "Tue", waiting: 25, completed: 30, canceled: 5, date: "2025-03-18" },
+  { name: "Wed", waiting: 30, completed: 35, canceled: 5, date: "2025-03-19" },
+  { name: "Thu", waiting: 40, completed: 35, canceled: 5, date: "2025-03-20" },
+  { name: "Fri", waiting: 50, completed: 35, canceled: 5, date: "2025-03-21" },
+  { name: "Sat", waiting: 60, completed: 35, canceled: 5, date: "2025-03-22" },
+  { name: "Sun", waiting: 70, completed: 35, canceled: 5, date: "2025-03-23" },
+];
+
 function DashboardPage() {
-  // Mock Data for Stats
-  const stats = [
-    { title: "Total Reservations", value: 120, icon: <CalendarCheck /> },
-    { title: "Pending Reservations", value: 30, icon: <Clock /> },
-    { title: "Seated Customers", value: 85, icon: <Users /> },
-    { title: "Cancelled", value: 5, icon: <XCircle /> },
-  ];
-
-  // Mock Data for Reservations
-  const reservations = [
-    {
-      id: 1,
-      name: "John Doe",
-      time: "6:30 PM",
-      date: "Feb 28, 2025",
-      table: "T-5",
-      capacity: "4",
-      status: "waiting",
-      phone: "123-456-7890",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      time: "7:00 PM",
-      date: "Feb 28, 2025",
-      table: "T-12",
-      capacity: "2",
-      status: "completed",
-      phone: "987-654-3210",
-    },
-    {
-      id: 3,
-      name: "Alice Johnson",
-      time: "7:30 PM",
-      date: "Feb 28, 2025",
-      table: "T-8",
-      capacity: "6",
-      status: "completed",
-      phone: "555-678-1234",
-    },
-    {
-      id: 4,
-      name: "Bob Williams",
-      time: "8:00 PM",
-      date: "Feb 28, 2025",
-      table: "T-3",
-      capacity: "3",
-      status: "canceled",
-      phone: "111-222-3333",
-    },
-  ];
-
-  // Mock Data for Chart
-  const data = [
-    { name: "Sun", count: 10 },
-    { name: "Mon", count: 2 },
-    { name: "Tue", count: 13 },
-    { name: "Wed", count: 5 },
-    { name: "Thu", count: 2 },
-    { name: "Fri", count: 16 },
-    { name: "Sat", count: 23 },
-  ];
-
+  const { reminders, stats, user_in_queues } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
+
+  const [chartData, setChartData] = useState(mockChartData);
+
+  useEffect(() => {
+    setChartData(mockChartData);
+  }, []);
+
+  const statCards = [
+    {
+      title: "Total Queues",
+      value: stats[0]?.total_queues || 0,
+      icon: <Users size={24} className="text-indigo-600" />,
+    },
+    {
+      title: "Waiting",
+      value: stats[0]?.waiting_count || 0,
+      icon: <Clock size={24} className="text-amber-600" />,
+    },
+    {
+      title: "Completed",
+      value: stats[0]?.completed_count || 0,
+      icon: <CalendarCheck size={24} className="text-green-600" />,
+    },
+    {
+      title: "Canceled",
+      value: stats[0]?.canceled_count || 0,
+      icon: <XCircle size={24} className="text-red-600" />,
+    },
+  ];
 
   const handleViewAllQueueButton = () => {
     navigate("/merchant/queue-manage");
   };
 
-  const { shop, reminders } = useLoaderData<typeof loader>();
-
   return (
     <div className="flex flex-col gap-8 p-6 bg-gray-50 min-h-screen">
       {/* Stats Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
+        {statCards.map((stat, index) => (
           <StatCard
             key={index}
             title={stat.title}
@@ -128,6 +122,7 @@ function DashboardPage() {
           />
         ))}
       </div>
+
       {/* Main Content */}
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Queues Section */}
@@ -142,9 +137,22 @@ function DashboardPage() {
             </button>
           </div>
           <div className="p-6 space-y-4 max-h-[65vh] overflow-y-auto">
-            {reservations.map((res) => (
-              <ReservationCard key={res.id} {...res} />
-            ))}
+            {user_in_queues && user_in_queues.length > 0 ? (
+              user_in_queues.map((res: any) => (
+                <ReservationCard
+                  key={res.queue_number}
+                  id={res.queue_number}
+                  name={res.customer_name}
+                  table={res.queue_number}
+                  status={res.status}
+                  phone={res.phone_number || ""}
+                />
+              ))
+            ) : (
+              <div className="text-center py-6 text-gray-500">
+                No active queues at the moment
+              </div>
+            )}
           </div>
         </div>
 
@@ -165,20 +173,18 @@ function DashboardPage() {
             </div>
             <div className="p-6 max-h-96 overflow-y-auto">
               <div className="flex flex-wrap gap-4">
-                {reminders.length != 0 ? (
-                  reminders.map((reminder: any, index: number) => {
-                    return (
-                      <ReminderCard
-                        key={index}
-                        id={reminder.id}
-                        title={reminder.title}
-                        time={new Date(reminder.due_date)}
-                        description={reminder.description}
-                      />
-                    );
-                  })
+                {reminders && reminders.length > 0 ? (
+                  reminders.map((reminder: any, index: number) => (
+                    <ReminderCard
+                      key={index}
+                      id={reminder.id}
+                      title={reminder.title}
+                      time={new Date(reminder.due_date)}
+                      description={reminder.description}
+                    />
+                  ))
                 ) : (
-                  <div>
+                  <div className="text-center w-full py-6 text-gray-500">
                     <h1>ไม่มีการแจ้งเตือน</h1>
                   </div>
                 )}
@@ -189,28 +195,37 @@ function DashboardPage() {
           {/* Chart Section */}
           <div className="bg-white rounded-xl shadow-lg p-6 h-[45vh]">
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-              Queue Chart
+              Weekly Queue Statistics
             </h2>
             <ResponsiveContainer width="100%" height="85%">
               <BarChart
-                data={data}
+                data={chartData}
                 margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis dataKey="name" stroke="#6b7280" />
                 <YAxis stroke="#6b7280" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "white",
-                    border: "1px solid #e5e7eb",
-                    borderRadius: "0.5rem",
-                  }}
+                <Tooltip />
+                <Legend />
+                <Bar
+                  name="Waiting"
+                  dataKey="waiting"
+                  stackId="a"
+                  fill="#f59e0b"
+                  radius={[4, 4, 0, 0]}
                 />
                 <Bar
-                  dataKey="count"
-                  fill="#6366f1"
+                  name="Completed"
+                  dataKey="completed"
+                  stackId="a"
+                  fill="#10b981"
                   radius={[4, 4, 0, 0]}
-                  activeBar={<Rectangle fill="#4f46e5" stroke="none" />}
+                />
+                <Bar
+                  name="Canceled"
+                  dataKey="canceled"
+                  fill="#ef4444"
+                  radius={[4, 4, 0, 0]}
                 />
               </BarChart>
             </ResponsiveContainer>

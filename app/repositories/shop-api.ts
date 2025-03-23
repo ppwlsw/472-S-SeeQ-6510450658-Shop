@@ -76,3 +76,28 @@ export async function changeshopAvatar(shop_id: number, formData: FormData, requ
     console.error("Error:", e);
   }
 }
+
+export async function fetchShopStat(shop_id: number, request: Request) {
+  try {
+    const { getCookie } = useAuth;
+    const data = await getCookie({request})
+    const token = data.token;
+    const res = await fetch(`${process.env.APP_URL}/queues/getShopStat/?shop_id=${shop_id}`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    const response = await res.json();
+
+    return {
+      "code": 200,
+      "data": response.data,
+      "shop_stat" : response.data.shop_stat,
+      "users_in_queues" : response.data.users_in_queues,
+    }
+  } catch (e) {
+    console.error(e);
+  }
+}
