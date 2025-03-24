@@ -25,13 +25,14 @@ import { shop_provider } from "~/provider/provider";
 import {
   changeshopAvatar,
   changeShopOpenStatus,
+  changeShopPassword,
   fetchingShopData,
   updateShop,
   type UpdateShopRequest,
 } from "~/repositories/shop-api";
 import Swal from "sweetalert2";
-import { ChangePasswordModal } from "~/components/change-password-modal";
 import { useAuth } from "~/utils/auth";
+import ChangePasswordModal from "~/components/change-password-modal";
 
 export async function loader({ request }: ActionFunctionArgs) {
   const { getCookie } = useAuth;
@@ -73,17 +74,20 @@ export async function action({ request }: ActionFunctionArgs) {
         phone: formData.get("phone") as string,
         description: formData.get("description") as string,
       };
-      updateShop(shop_id, content, request);
+      await updateShop(shop_id, content, request);
       break;
 
     case "changeShopImage":
-      changeshopAvatar(shop_id, formData, request);
+      await changeshopAvatar(shop_id, formData, request);
       break;
 
     case "changePassword":
-      // Handle password change logic here
-      // For now just simulating success
-      return { success: true };
+      const changePasswordResponse = await changeShopPassword(
+        request,
+        formData
+      );
+      return changePasswordResponse;
+      break;
   }
 }
 

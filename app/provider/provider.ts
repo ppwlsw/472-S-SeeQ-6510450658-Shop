@@ -65,14 +65,18 @@ function setShopReminder(shop_id: number, reminder: Reminder) {
   reminder_provider[shop_id].push(reminder);
 }
 
-function setQueueProvider(shop_id: number, queueTypes: QueueType[]) {
+async function setQueueProvider(shop_id: number, queueTypes: QueueType[]) {
   queue_provider[shop_id] = queueTypes;
-  queue_provider[shop_id].forEach(async (queue) => {
-    const image_url = await prefetchImage(queue.image_url ?? "");
-    queue.image_url = image_url;
+  for (let i = 0; i < queue_provider[shop_id].length; i++) {
+    const image_url = await prefetchImage(queue_provider[shop_id][i].image_url ?? "");
+    queue_provider[shop_id][i].image_url = image_url;
   }
-  );
+}
 
+async function updateQueueProvider(shop_id: number, queueType: QueueType) {
+  const image_url = await prefetchImage("");
+  queueType.image_url = image_url;
+  queue_provider[shop_id].push(queueType); 
 }
 
 function deleteQueueTypeProvider(shop_id: number, queueType_id: number) {
@@ -80,4 +84,4 @@ function deleteQueueTypeProvider(shop_id: number, queueType_id: number) {
 }
 
 export { shop_provider, reminder_provider, queue_provider};
-export { setShopProvider, setShopReminder, updateShopOpenStatus, setQueueProvider , deleteQueueTypeProvider};
+export { setShopProvider, setShopReminder, updateShopOpenStatus, setQueueProvider , deleteQueueTypeProvider, updateQueueProvider};

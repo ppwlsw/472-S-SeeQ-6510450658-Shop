@@ -1,4 +1,4 @@
-import { setQueueProvider, shop_provider } from "~/provider/provider";
+import { deleteQueueTypeProvider, queue_provider, setQueueProvider, shop_provider, updateQueueProvider } from "~/provider/provider";
 import { useAuth } from "~/utils/auth";
 import useAxiosInstance from "~/utils/axiosInstance";
 import { prefetchImage } from "~/utils/image-proxy";
@@ -27,9 +27,7 @@ export interface QueueTypePayload {
 
 export async function fetchingQueuesType(request: Request, shop_id: number) {
     try {
-        console.log(
-            "fetching queue types"
-        )
+    
         const { getCookie } = useAuth
         const cookie = await getCookie({ request });
         const token = cookie.token;
@@ -43,7 +41,7 @@ export async function fetchingQueuesType(request: Request, shop_id: number) {
         const queueTypes = data.data;
         setQueueProvider(shop_id, queueTypes);
         return {
-            queueTypes
+            queueTypes : queue_provider[shop_id]
         };
 
     } catch (error) {
@@ -67,7 +65,7 @@ export async function createQueueType(request: Request, payload: FormData) {
         const res = await response.json();
         const image_url = await prefetchImage(res.data.image_url ?? "");
         res.data.image_url = image_url;
-        setQueueProvider(res.data.shop_id, res.data);
+        updateQueueProvider(res.data.shop_id, res.data);
 
 
     } catch (e) {
@@ -75,7 +73,7 @@ export async function createQueueType(request: Request, payload: FormData) {
     }
 }
 
-export async function deleteQueueType(request: Request, queue_id: number) {
+export async function deleteQueueType(request: Request, queue_id: number, shop_id: number) {
     try {
         const { getCookie } = useAuth;
         const cookie = await getCookie({ request });
@@ -88,6 +86,8 @@ export async function deleteQueueType(request: Request, queue_id: number) {
             method : "DELETE"
         });
 
+        deleteQueueTypeProvider(shop_id,queue_id);
+
         return response;
 
     }
@@ -97,7 +97,7 @@ export async function deleteQueueType(request: Request, queue_id: number) {
     }
 }
 
-export async function updateQueueType(request: Request, queue_id: number, payload: QueueTypePayload) {
+export async function updateQueueType(request: Request, queue_id: number, payload: FormData) {
     try {
         const { getCookie } = useAuth;
         const cookie = await getCookie({ request });

@@ -55,7 +55,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return {
     shop: shop_provider[user_id] || null,
     reminders: reminder_provider[shop_id] || [],
-    stats: null,
+    stats: [
+      {
+        total_queues: 0,
+        waiting_count: 0,
+        completed_count: 0,
+        canceled_count: 0,
+      },
+    ],
     user_in_queues: [],
     shop_id: shop_id,
   };

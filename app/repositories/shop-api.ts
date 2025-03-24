@@ -14,7 +14,7 @@ export async function fetchingShopData(user_id : number, request: Request) {
         const { getCookie } = useAuth;
         const data = await getCookie({request})
         const token = data.token;
-        const res = await fetch(`http://laravel.test/api/users/${user_id}/shop`, {
+        const res = await fetch(`${process.env.APP_URL}/users/${user_id}/shop`, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -105,6 +105,47 @@ export async function fetchShopStat(shop_id: number, request: Request) {
 
 
     return response.data;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+export async function changeShopPassword(request : Request, formData: FormData){
+  try {
+    const { getCookie } = useAuth;
+    const data = await getCookie({request})
+    const token = data.token;
+    const user_id = data.user_id;
+
+    const res = await fetch(`http://laravel.test/api/users/${user_id}/password`, {
+      method: "PUT",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        "new_password": formData.get("new_password"),
+      })
+    });
+      
+    const response = await res.json();
+
+    
+    if(res.status === 200) {
+      return {
+        "code": 200,
+      }
+    }
+
+    if (response.code !== 200) {
+      return {
+        "code": 500,
+        "data": response.message
+      }
+    
+  }
+
+    // return response;
   } catch (e) {
     console.error(e);
   }

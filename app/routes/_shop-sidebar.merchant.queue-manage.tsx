@@ -9,15 +9,12 @@ import {
   type LoaderFunctionArgs,
 } from "react-router";
 import QueueTypeCard from "~/components/queue-type-card";
-import {
-  deleteQueueTypeProvider,
-  queue_provider,
-  shop_provider,
-} from "~/provider/provider";
+import { queue_provider, shop_provider } from "~/provider/provider";
 import {
   createQueueType,
   deleteQueueType,
   fetchingQueuesType,
+  updateQueueType,
 } from "~/repositories/queues-api";
 import { useAuth } from "~/utils/auth";
 
@@ -28,10 +25,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const user_id = data.user_id;
   const shop_id = shop_provider[user_id]?.id;
 
-  try {
-    await fetchingQueuesType(request, shop_id);
-  } catch (e) {
-    console.error(e);
+  // ตรวจสอบว่า queue_provider สำหรับ shop_id นั้นมีข้อมูลหรือยัง
+  if (!queue_provider[shop_id] || queue_provider[shop_id].length === 0) {
+    try {
+      await fetchingQueuesType(request, shop_id); // ดึงข้อมูลจาก API
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   const queuesType = queue_provider[shop_id];
@@ -44,6 +44,9 @@ export async function action({ request }: ActionFunctionArgs) {
   const action = formData.get("_action");
   const { getCookie } = useAuth;
   const data = await getCookie({ request });
+  const user_id = data.user_id;
+  const queue_id = parseInt(formData.get("queue_id") as string);
+  const shop_id = shop_provider[user_id].id;
 
   if (!data) return redirect("/login");
 
@@ -52,8 +55,10 @@ export async function action({ request }: ActionFunctionArgs) {
       await createQueueType(request, formData);
       break;
     case "deleteQueueType":
-      const queue_id = parseInt(formData.get("queue_id") as string);
-      await deleteQueueType(request, queue_id);
+      await deleteQueueType(request, queue_id, shop_id);
+      break;
+    case "editQueueType":
+      await updateQueueType(request, queue_id, formData);
       break;
   }
 
@@ -101,7 +106,18 @@ function QueueTypeManagePage() {
               method="POST"
               encType="multipart/form-data"
               className="space-y-5"
-              onSubmit={() => setIsModalOpen(false)}
+              onSubmit={(e) => {
+                const formData = new FormData(e.currentTarget);
+
+                if (
+                  !formData.get("image_url") ||
+                  formData.get("image_url") === "undefined"
+                ) {
+                  formData.set("image_url", "");
+                }
+
+                setIsModalOpen(false);
+              }}
             >
               <input
                 type="number"
@@ -119,11 +135,12 @@ function QueueTypeManagePage() {
                   <input
                     type="file"
                     name="image"
-                    defaultValue={""}
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) {
                         setPreviewImage(URL.createObjectURL(file));
+                      } else {
+                        setPreviewImage(null);
                       }
                     }}
                     className="hidden"

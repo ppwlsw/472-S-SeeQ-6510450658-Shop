@@ -56,7 +56,6 @@ const MerchantNav = () => {
 
   const { shop } = useLoaderData<typeof loader>();
   const [isPoping, setIsPoping] = useState<boolean>(false);
-  console.log(isPoping);
   return (
     <div className="flex flex-row h-screen">
       {/* Sidebar */}
@@ -104,9 +103,13 @@ const MerchantNav = () => {
               label="จัดการร้านค้า"
               paths={["/merchant/store-management"]}
             />
-            <LogoutModal isPoping={isPoping} setIsPoping={ setIsPoping }/>
-            <button className="flex flex-row justify-start items-center px-6 py-2 mx-4 gap-4 border-[1px] border-transparent hover:text-red-600 hover:border-red-600 hover:scale-105 duration-300 rounded-md"
-            onClick={ () => { setIsPoping(true) }}>
+            <LogoutModal isPoping={isPoping} setIsPoping={setIsPoping} />
+            <button
+              className="flex flex-row justify-start items-center px-6 py-2 mx-4 gap-4 border-[1px] border-transparent hover:text-red-600 hover:border-red-600 hover:scale-105 duration-300 rounded-md"
+              onClick={() => {
+                setIsPoping(true);
+              }}
+            >
               <LogOut className="w-5 h-5" />
               <p>ออกจากระบบ</p>
             </button>

@@ -1,179 +1,139 @@
-import { EyeOff, XCircle, Lock, CheckCircle, Eye } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogOverlay,
+  DialogContent,
+  DialogTitle,
+  DialogHeader,
+} from "~/components/ui/dialog";
+import { Eye, EyeOff } from "lucide-react";
 import { useFetcher } from "react-router";
+import Swal from "sweetalert2";
 
-export function ChangePasswordModal({ isOpen, onClose }: any) {
-  const [passwordVisible, setPasswordVisible] = useState(false);
-  const [newPasswordVisible, setNewPasswordVisible] = useState(false);
-  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState("");
+function ChangePasswordModal({ isOpen, onClose }: any) {
+  const fetcher = useFetcher();
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
-  const fetcher = useFetcher();
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    console.log("Fetch Response:", fetcher.data); // Debugging
+
+    if (fetcher.state === "idle" && fetcher.data) {
+      const { code, data } = fetcher.data;
+      if (code === 500) {
+        Swal.fire({
+          title: "เกิดข้อผิดพลาด!",
+          text: data, // Message from API
+          icon: "error",
+          timer: 3000,
+          timerProgressBar: true,
+          showConfirmButton: false,
+          position: "top-end",
+          toast: true,
+        });
+      } else {
+        Swal.fire({
+          title: "สำเร็จ!",
+          text: "รหัสผ่านถูกเปลี่ยนเรียบร้อยแล้ว",
+          icon: "success",
+          timer: 2000,
+          timerProgressBar: true,
+          showConfirmButton: false,
+          position: "top-end",
+          toast: true,
+        });
+        onClose();
+      }
+    }
+  }, [fetcher.data, fetcher.state, onClose]);
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
-
     setError("");
-    setSuccess(false);
-
-    if (!currentPassword || !newPassword || !confirmPassword) {
-      setError("All fields are required");
-      return;
-    }
 
     if (newPassword !== confirmPassword) {
-      setError("New passwords don't match");
+      setError("รหัสผ่านใหม่ไม่ตรงกัน");
       return;
     }
 
-    if (newPassword.length < 6) {
-      setError("Password must be at least 6 characters");
-      return;
-    }
-    setSuccess(true);
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
+    console.log("Submitting Password Change..."); // Debugging
 
-    setTimeout(() => {
-      onClose();
-      setSuccess(false);
-    }, 2000);
+    fetcher.submit(
+      {
+        _action: "changePassword",
+        new_password: newPassword,
+      },
+      { method: "POST" }
+    );
+
+    console.log("fetcher.submit() executed!"); // Check if it runs
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-      <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full relative animate-fadeIn">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-        >
-          <XCircle size={24} />
-        </button>
-
-        <div className="mb-6 text-center">
-          <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Lock size={28} className="text-blue-600" />
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogOverlay className="fixed inset-0 bg-black bg-opacity-50" />
+      <DialogContent className="fixed top-1/4 left-1/2 transform -translate-x-1/2 p-6 bg-white rounded-lg shadow-lg w-96">
+        <DialogHeader>
+          <DialogTitle>เปลี่ยนรหัสผ่าน</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* New Password */}
+          <div className="relative">
+            <label className="block text-sm font-medium text-gray-700">
+              รหัสผ่านใหม่
+            </label>
+            <input
+              type={showNewPassword ? "text" : "password"}
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              required
+              className="w-full p-2 border rounded-lg pr-10"
+            />
+            <button
+              type="button"
+              onClick={() => setShowNewPassword(!showNewPassword)}
+              className="absolute right-3 top-9 text-gray-600 hover:text-gray-800"
+            >
+              {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
           </div>
-          <h2 className="text-2xl font-bold text-gray-800">Change Password</h2>
-          <p className="text-gray-600 mt-1">Update your account password</p>
-        </div>
 
-        {success ? (
-          <div className="bg-green-100 p-4 rounded-lg flex items-center gap-3 mb-4">
-            <CheckCircle className="text-green-600" size={20} />
-            <span className="text-green-800">
-              Password updated successfully!
-            </span>
+          {/* Confirm Password */}
+          <div className="relative">
+            <label className="block text-sm font-medium text-gray-700">
+              ยืนยันรหัสผ่านใหม่
+            </label>
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              className="w-full p-2 border rounded-lg pr-10"
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-3 top-9 text-gray-600 hover:text-gray-800"
+            >
+              {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
           </div>
-        ) : (
-          <fetcher.Form
-            onSubmit={() => {
-              handleSubmit;
-              setPasswordVisible(!passwordVisible);
-            }}
-            className="space-y-4"
+
+          {error && <p className="text-red-500 text-sm">{error}</p>}
+
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition"
           >
-            {error && (
-              <div className="bg-red-100 p-3 rounded text-red-700 text-sm">
-                {error}
-              </div>
-            )}
-
-            <div>
-              <label className="block text-gray-700 mb-1 text-sm font-medium">
-                Current Password
-              </label>
-              <div className="relative">
-                <input
-                  type={passwordVisible ? "text" : "password"}
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg pr-10 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter current password"
-                />
-                <button
-                  type="submit"
-                  name="_action"
-                  value="changePassword"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
-                >
-                  {passwordVisible ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-gray-700 mb-1 text-sm font-medium">
-                New Password
-              </label>
-              <div className="relative">
-                <input
-                  type={newPasswordVisible ? "text" : "password"}
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg pr-10 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter new password"
-                />
-                <button
-                  type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
-                  onClick={() => setNewPasswordVisible(!newPasswordVisible)}
-                >
-                  {newPasswordVisible ? (
-                    <EyeOff size={18} />
-                  ) : (
-                    <Eye size={18} />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-gray-700 mb-1 text-sm font-medium">
-                Confirm New Password
-              </label>
-              <div className="relative">
-                <input
-                  type={confirmPasswordVisible ? "text" : "password"}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg pr-10 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Confirm new password"
-                />
-                <button
-                  type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
-                  onClick={() =>
-                    setConfirmPasswordVisible(!confirmPasswordVisible)
-                  }
-                >
-                  {confirmPasswordVisible ? (
-                    <EyeOff size={18} />
-                  ) : (
-                    <Eye size={18} />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <div className="pt-2">
-              <button
-                type="submit"
-                className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition duration-200 flex items-center justify-center gap-2"
-              >
-                <Lock size={18} />
-                Update Password
-              </button>
-            </div>
-          </fetcher.Form>
-        )}
-      </div>
-    </div>
+            เปลี่ยนรหัสผ่าน
+          </button>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
+
+export default ChangePasswordModal;
