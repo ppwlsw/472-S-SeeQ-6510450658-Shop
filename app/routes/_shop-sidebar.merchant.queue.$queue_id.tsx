@@ -18,7 +18,7 @@ import {
 import Swal from "sweetalert2";
 import { useEffect } from "react";
 import { useAuth } from "~/utils/auth";
-import { ArrowRightCircle, ChevronLast, SkipForward } from "lucide-react";
+import { ArrowRightCircle, SkipForward } from "lucide-react";
 import { shop_provider } from "~/provider/provider";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
@@ -28,8 +28,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     var queueDetail = await fetchQueueDetail(request, queue_id);
   } catch (e) {
     console.error(e);
-    inQueues = { data: [] }; // Ensure we always return an array
-    queueDetail = { data: null }; // Handle missing data
+    inQueues = { data: [] };
+    queueDetail = { data: null };
   }
   return { queueItems: inQueues.data, queueDetail: queueDetail.data };
 }
@@ -104,7 +104,6 @@ function QueueManagePage() {
   const fetcher = useFetcher();
   const navigate = useNavigate();
 
-  // Monitor fetcher data for showing SweetAlert notifications
   useEffect(() => {
     if (fetcher.data && fetcher.state === "idle") {
       const { success, message } = fetcher.data;
@@ -326,7 +325,7 @@ function QueueManagePage() {
                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
               ></path>
             </svg>
-            Queue List
+            รายการคิว
           </h2>
           <span className="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">
             {queueItems.length} customers
@@ -369,13 +368,12 @@ function QueueManagePage() {
               </svg>
             </div>
             <h3 className="mt-2 text-gray-500 text-xl font-medium">
-              No customers in queue
+              ไม่มีลูกค้าในคิว
             </h3>
-            <p className="text-gray-400 mt-1">Your queue is currently empty</p>
             <p className="text-blue-500 text-sm mt-4">
               {queueDetail?.is_available
-                ? "Queue is open and waiting for customers"
-                : "Queue is currently closed"}
+                ? "รอลูกค้าเข้าคิว"
+                : "คิวปิดให้บริการ"}
             </p>
           </div>
         )}
@@ -394,7 +392,7 @@ function QueueManagePage() {
 
         <button
           onClick={handleNextQueue}
-          className="px-5 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all duration-300 
+          className="px-5 py-3 bg-blue-700 text-white rounded-lg hover:bg-blue-600 transition-all duration-300 
               shadow-lg flex items-center justify-center gap-2 transform hover:scale-102 active:scale-95 min-w-32
               relative overflow-hidden group"
         >
@@ -404,7 +402,7 @@ function QueueManagePage() {
                   origin-left bg-blue-600 z-0"
           ></div>
           <ArrowRightCircle className="w-5 h-5 relative z-10" />
-          <span className="relative z-10">เรียกคิวนี้</span>
+          <span className="relative z-10">เรียกคิวถัดไป</span>
         </button>
       </div>
     </div>

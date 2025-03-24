@@ -106,26 +106,28 @@ function ShopManagePage() {
     e.preventDefault(); // Prevent default form submission
 
     Swal.fire({
-      title: shop.is_open ? "Close Shop?" : "Open Shop?",
+      title: shop.is_open ? "ต้องการ ปิดร้าน?" : "ต้องการ เปิดร้าน?",
       text: shop.is_open
-        ? "Are you sure you want to close your Shop?"
-        : "Are you sure you want to open your Shop?",
+        ? "คุณต้องการปิดร้านใช่หรือไม่?"
+        : "คุณต้องการเปิดร้านใช่หรือไม่?",
       icon: "warning",
+      customClass: {
+        confirmButton: "order-2",
+        cancelButton: "order-1",
+      },
       showCancelButton: true,
       confirmButtonColor: shop.is_open ? "#d33" : "#08db0f",
       cancelButtonColor: "#6b7280",
-      confirmButtonText: shop.is_open ? "Yes, close it!" : "Yes, open it!",
+      cancelButtonText: "ยกเลิก",
+      confirmButtonText: shop.is_open ? "ใช่, ปิดร้านเลย" : "ใช่, เปิดร้านเลย!",
     }).then((result) => {
       if (result.isConfirmed) {
-        // Submit the form programmatically
         fetcher.submit({ _action: "shopStatus" }, { method: "PUT" });
-
-        // Optional: Show success message after submission
         Swal.fire(
-          "Success!",
+          "สำเร็จ!",
           shop.is_open
-            ? "Your shop has been closed."
-            : "Your shop is now open.",
+            ? "ปิดร้านของคุณเรียบร้อยแล้ว."
+            : "เปิดร้านของคุณเรียบร้อยแล้ว.",
           "success"
         );
       }
@@ -155,7 +157,7 @@ function ShopManagePage() {
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
             <Store className="text-blue-600" size={24} />
-            Shop Management
+            จัดการร้านค้า
           </h1>
 
           <div className="flex items-center gap-3">
@@ -169,7 +171,7 @@ function ShopManagePage() {
                 <span
                   className={shop.is_open ? "text-green-700" : "text-red-700"}
                 >
-                  {shop.is_open ? "Open" : "Closed"}
+                  {shop.is_open ? "เปิดร้านค้า" : "ปิดร้าน"}
                 </span>
               </span>
               <button
@@ -183,7 +185,7 @@ function ShopManagePage() {
                     : "bg-green-500 hover:bg-green-600 hover:shadow-md"
                 }`}
               >
-                {shop.is_open ? "Close Shop" : "Open Shop"}
+                {shop.is_open ? "ปิดร้านค้า" : "เปิดร้านค้า"}
               </button>
             </fetcher.Form>
           </div>
@@ -253,7 +255,7 @@ function ShopManagePage() {
                 className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 flex items-center gap-2 transition duration-200"
               >
                 <Lock size={16} />
-                Change Password
+                เปลี่ยนรหัสผ่าน
               </button>
 
               <button
@@ -267,11 +269,11 @@ function ShopManagePage() {
               >
                 {isEditing ? (
                   <>
-                    <XCircle size={16} /> Cancel
+                    <XCircle size={16} /> ยกเลิก
                   </>
                 ) : (
                   <>
-                    <Pencil size={16} /> Edit Profile
+                    <Pencil size={16} /> แก้ไขโปรไฟล์
                   </>
                 )}
               </button>
@@ -290,7 +292,7 @@ function ShopManagePage() {
                     htmlFor="name"
                     className="font-medium flex items-center gap-2 text-gray-700 mb-2"
                   >
-                    <Store size={16} className="text-blue-600" /> Store Name
+                    <Store size={16} className="text-blue-600" /> ชื่อร้านค้า
                   </label>
                   <input
                     disabled={!isEditing}
@@ -308,7 +310,8 @@ function ShopManagePage() {
                     htmlFor="phone"
                     className="font-medium flex items-center gap-2 text-gray-700 mb-2"
                   >
-                    <Phone size={16} className="text-blue-600" /> Phone Number
+                    <Phone size={16} className="text-blue-600" />{" "}
+                    หมายเลขโทรศัพท์
                   </label>
                   <input
                     disabled={!isEditing}
@@ -327,7 +330,7 @@ function ShopManagePage() {
                   htmlFor="address"
                   className="font-medium flex items-center gap-2 text-gray-700 mb-2"
                 >
-                  <MapPin size={16} className="text-blue-600" /> Address
+                  <MapPin size={16} className="text-blue-600" /> ที่ิอยู่
                 </label>
                 <input
                   id="address"
@@ -344,7 +347,7 @@ function ShopManagePage() {
                   htmlFor="description"
                   className="font-medium flex items-center gap-2 text-gray-700 mb-2"
                 >
-                  <FileText size={16} className="text-blue-600" /> Description
+                  <FileText size={16} className="text-blue-600" /> รายละเอียด
                 </label>
                 <textarea
                   disabled={!isEditing}
@@ -366,7 +369,7 @@ function ShopManagePage() {
                     value="updateShop"
                     className="px-8 py-3 rounded-lg bg-green-600 hover:bg-green-700 text-white flex items-center gap-2 transition duration-200 shadow-md hover:shadow-lg"
                   >
-                    <Save size={18} /> Save Changes
+                    <Save size={18} /> บันทึกการเปลี่ยนแปลง
                   </button>
                 </div>
               )}

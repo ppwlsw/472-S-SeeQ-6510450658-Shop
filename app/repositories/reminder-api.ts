@@ -10,7 +10,6 @@ export interface ReminderProp {
 }
 
 export async function fetchingShopReminders(shop_id: number, request: Request) {
-    console.log("fetching reminders")
     try {
         const axios = useAxiosInstance(request);
         const response = await axios.get(`/shops/reminders/${shop_id}`);

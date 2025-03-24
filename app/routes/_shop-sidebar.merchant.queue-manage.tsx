@@ -10,10 +10,15 @@ import {
 } from "react-router";
 import QueueTypeCard from "~/components/queue-type-card";
 import {
+  deleteQueueTypeProvider,
   queue_provider,
   shop_provider,
 } from "~/provider/provider";
-import { createQueueType, fetchingQueuesType } from "~/repositories/queues-api";
+import {
+  createQueueType,
+  deleteQueueType,
+  fetchingQueuesType,
+} from "~/repositories/queues-api";
 import { useAuth } from "~/utils/auth";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -22,12 +27,16 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const user_id = data.user_id;
   const shop_id = shop_provider[user_id]?.id;
+
   try {
     await fetchingQueuesType(request, shop_id);
   } catch (e) {
     console.error(e);
   }
-  return { queuesType: queue_provider[shop_id] || [], shop_id: shop_id };
+
+  const queuesType = queue_provider[shop_id];
+
+  return { queuesType: queuesType, shop_id: shop_id };
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -41,6 +50,10 @@ export async function action({ request }: ActionFunctionArgs) {
   switch (action) {
     case "createQueueType":
       await createQueueType(request, formData);
+      break;
+    case "deleteQueueType":
+      const queue_id = parseInt(formData.get("queue_id") as string);
+      await deleteQueueType(request, queue_id);
       break;
   }
 
@@ -106,6 +119,7 @@ function QueueTypeManagePage() {
                   <input
                     type="file"
                     name="image"
+                    defaultValue={""}
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) {
@@ -227,9 +241,7 @@ function QueueTypeManagePage() {
           ))}
         </div>
       ) : (
-        <div className="text-center text-gray-500 mt-8">
-          No queue types available
-        </div>
+        <div className="text-center text-gray-500 mt-8">ไม่มีประเภทของคิว</div>
       )}
     </div>
   );

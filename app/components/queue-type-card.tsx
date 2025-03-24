@@ -1,18 +1,22 @@
 import type { QueueType } from "~/repositories/queues-api";
-import { Utensils, Users, Tag } from "lucide-react";
-import { useNavigate } from "react-router";
+import { Utensils, Users, Tag, Edit, Trash2 } from "lucide-react";
+import { useNavigate, useRevalidator } from "react-router";
+import { useEffect, useState } from "react";
+import { useFetcher } from "react-router";
+import Swal from "sweetalert2";
 
 export default function QueueTypeCard({ queueType }: { queueType: QueueType }) {
   const navigate = useNavigate();
-  // console.log("QueueTypeCard", queueType);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const fetcher = useFetcher();
+
   const handleClick = () => {
     navigate(`/merchant/queue/${queueType.id}`);
   };
-
   return (
     <div
       onClick={handleClick}
-      className="flex flex-col bg-white border border-gray-200 rounded-2xl p-6 shadow-md hover:shadow-lg active:scale-95 cursor-pointer transition duration-150 ease-in-out w-80"
+      className="flex flex-col bg-white border border-gray-200 rounded-2xl p-6 shadow-md hover:shadow-lg hover:scale-95 cursor-pointer transition duration-150 ease-in-out w-80 relative"
       role="button"
       tabIndex={0} // Adds keyboard accessibility
     >
@@ -57,7 +61,6 @@ export default function QueueTypeCard({ queueType }: { queueType: QueueType }) {
           <Users className="w-4 h-4 mr-1 text-gray-500" />
           <span>{queueType.queue_counter} in queue</span>
         </div>
-
         <div className="flex items-center">
           <Tag className="w-4 h-4 mr-1 text-gray-500" />
           <span>Tag: {queueType.tag}</span>

@@ -1,4 +1,4 @@
-import { setQueueProvider } from "~/provider/provider";
+import { setQueueProvider, shop_provider } from "~/provider/provider";
 import { useAuth } from "~/utils/auth";
 import useAxiosInstance from "~/utils/axiosInstance";
 import { prefetchImage } from "~/utils/image-proxy";
@@ -19,7 +19,7 @@ export interface QueueType {
 export interface QueueTypePayload {
     shop_id : number
     name : string,
-    image : File,
+    image? : File,
     description : string,
     is_available : boolean,
     tag : string,
@@ -53,7 +53,6 @@ export async function fetchingQueuesType(request: Request, shop_id: number) {
 }
 
 export async function createQueueType(request: Request, payload: FormData) {
-    console.log("payload", payload);
     try {
         const { getCookie } = useAuth;
         const data = await getCookie({ request });
@@ -68,12 +67,56 @@ export async function createQueueType(request: Request, payload: FormData) {
         const res = await response.json();
         const image_url = await prefetchImage(res.data.image_url ?? "");
         res.data.image_url = image_url;
-        console.log("res.data :", res.data);
         setQueueProvider(res.data.shop_id, res.data);
 
 
     } catch (e) {
         console.error("error creating queue type : ", e);
+    }
+}
+
+export async function deleteQueueType(request: Request, queue_id: number) {
+    try {
+        const { getCookie } = useAuth;
+        const cookie = await getCookie({ request });
+        const token = cookie.token;
+
+        const response = await fetch(`http://laravel.test/api/queues/${queue_id}`, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+            },
+            method : "DELETE"
+        });
+
+        return response;
+
+    }
+    catch (error) {
+        console.error("Error fetching queue types:", error);
+        return { code: 500, data: [] };
+    }
+}
+
+export async function updateQueueType(request: Request, queue_id: number, payload: QueueTypePayload) {
+    try {
+        const { getCookie } = useAuth;
+        const cookie = await getCookie({ request });
+        const token = cookie.token;
+        const response = await fetch(`http://laravel.test/api/queues/${queue_id}`, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            },
+            method : "PATCH",
+            body : JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+        return data;
+
+    } catch (error) {
+        console.error("Error fetching queue types:", error);
+        return { code: 500, data: [] };
     }
 }
 

@@ -11,9 +11,18 @@ export interface UpdateShopRequest {
 
 export async function fetchingShopData(user_id : number, request: Request) {
     try {
-        const axios = useAxiosInstance(request)
-        const shop : any = await axios.get(`/users/${user_id}/shop`)
-        await setShopProvider(user_id, shop);
+        const { getCookie } = useAuth;
+        const data = await getCookie({request})
+        const token = data.token;
+        const res = await fetch(`http://laravel.test/api/users/${user_id}/shop`, {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+        });
+        const shop = await res.json();
+
+        await setShopProvider(user_id, shop.data);
 
       } catch (error) {
         console.error(error);
@@ -79,9 +88,12 @@ export async function changeshopAvatar(shop_id: number, formData: FormData, requ
 
 export async function fetchShopStat(shop_id: number, request: Request) {
   try {
+    console.log("fetching shop stat")
     const { getCookie } = useAuth;
     const data = await getCookie({request})
     const token = data.token;
+
+
     const res = await fetch(`${process.env.APP_URL}/queues/getShopStat/?shop_id=${shop_id}`, {
       method: "GET",
       headers: {
@@ -91,12 +103,8 @@ export async function fetchShopStat(shop_id: number, request: Request) {
 
     const response = await res.json();
 
-    return {
-      "code": 200,
-      "data": response.data,
-      "shop_stat" : response.data.shop_stat,
-      "users_in_queues" : response.data.users_in_queues,
-    }
+
+    return response.data;
   } catch (e) {
     console.error(e);
   }

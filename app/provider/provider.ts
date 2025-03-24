@@ -73,8 +73,11 @@ function setQueueProvider(shop_id: number, queueTypes: QueueType[]) {
   }
   );
 
-  console.log("set queue_provider : "+shop_id+"", queue_provider[shop_id]);
+}
+
+function deleteQueueTypeProvider(shop_id: number, queueType_id: number) {
+  queue_provider[shop_id] = queue_provider[shop_id].filter(queue => queue.id !== queueType_id);
 }
 
 export { shop_provider, reminder_provider, queue_provider};
-export { setShopProvider, setShopReminder, updateShopOpenStatus, setQueueProvider };
+export { setShopProvider, setShopReminder, updateShopOpenStatus, setQueueProvider , deleteQueueTypeProvider};
