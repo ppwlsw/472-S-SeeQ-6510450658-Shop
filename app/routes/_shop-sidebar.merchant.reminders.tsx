@@ -166,8 +166,8 @@ export default function RemindersPage() {
           ))}
         </div>
       ) : (
-        <div className="flex w-full h-full">
-          <h1>No Reminders</h1>
+        <div className="flex w-full h-full justify-center items-center text-gray-400">
+          <h1>ไม่มีการแจ้งเตือน</h1>
         </div>
       )}
     </div>
