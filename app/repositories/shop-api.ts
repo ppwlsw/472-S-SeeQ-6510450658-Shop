@@ -14,7 +14,7 @@ export async function fetchingShopData(user_id : number, request: Request) {
         const { getCookie } = useAuth;
         const data = await getCookie({request})
         const token = data.token;
-        const res = await fetch(`${process.env.APP_URL}/users/${user_id}/shop`, {
+        const res = await fetch(`${process.env.API_BASE_URL}/users/${user_id}/shop`, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -72,7 +72,7 @@ export async function changeshopAvatar(shop_id: number, formData: FormData, requ
     const { getCookie } = useAuth;
     const data = await getCookie({request})
     const token = data.token;
-    const response = await fetch(`${process.env.APP_URL}/shops/${shop_id}/avatar`, {
+    const response = await fetch(`${process.env.API_BASE_URL}/shops/${shop_id}/avatar`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${token}`,
@@ -94,7 +94,7 @@ export async function fetchShopStat(shop_id: number, request: Request) {
     const token = data.token;
 
 
-    const res = await fetch(`${process.env.APP_URL}/queues/getShopStat/?shop_id=${shop_id}`, {
+    const res = await fetch(`${process.env.API_BASE_URL}/queues/getShopStat/?shop_id=${shop_id}`, {
       method: "GET",
       headers: {
         "Authorization": `Bearer ${token}`,

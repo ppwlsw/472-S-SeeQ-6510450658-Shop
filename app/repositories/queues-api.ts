@@ -55,7 +55,7 @@ export async function createQueueType(request: Request, payload: FormData) {
         const { getCookie } = useAuth;
         const data = await getCookie({ request });
         const token = data.token;
-        const response = await fetch(`${process.env.APP_URL}/queues`, {
+        const response = await fetch(`${process.env.API_BASE_URL}/queues`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${token}`,
