@@ -112,8 +112,11 @@ export async function updateQueueType(request: Request, queue_id: number, payloa
             method : "PATCH",
             body : JSON.stringify(payload)
         });
-
         const data = await response.json();
+        delete data.data.shop
+        const queueTypePayload : QueueType = data.data;
+        console.log("Queue Type Payload : ", queueTypePayload);
+        updateQueueProvider(queueTypePayload.shop_id, queueTypePayload);
         return data;
 
     } catch (error) {

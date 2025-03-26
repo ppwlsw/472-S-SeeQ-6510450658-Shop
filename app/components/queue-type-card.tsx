@@ -1,31 +1,82 @@
 import type { QueueType } from "~/repositories/queues-api";
 import { Utensils, Users, Tag, Edit, Trash2, X } from "lucide-react";
 import { useNavigate, useRevalidator } from "react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useFetcher } from "react-router";
-import Swal from "sweetalert2";
+import { Button } from "~/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "~/components/ui/dialog";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import { Textarea } from "~/components/ui/textarea";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "~/components/ui/alert-dialog";
 
 export default function QueueTypeCard({ queueType }: { queueType: QueueType }) {
   const navigate = useNavigate();
   const fetcher = useFetcher();
   const validator = useRevalidator();
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editedData, setEditedData] = useState({ ...queueType });
+  const [editedData, setEditedData] = useState<QueueType>({ ...queueType });
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const handleClick = () => {
     navigate(`/merchant/queue/${queueType.id}`);
   };
 
-  const handleEditChange = (e: any) => {
+  const handleEditChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setEditedData({ ...editedData, [name]: value });
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setPreviewImage(URL.createObjectURL(file));
+      setImageFile(file);
+    } else {
+      setPreviewImage(null);
+      setImageFile(null);
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    formData.append("queue_id", queueType.id.toString());
+    formData.append("_action", "editQueueType");
+
+    // Handle image upload
+    if (imageFile) {
+      formData.append("image", imageFile);
+    }
+
+    fetcher.submit(formData, { method: "PATCH" });
+    validator.revalidate();
+  };
+
   return (
     <div
-      className="flex flex-col bg-white border border-gray-200 rounded-2xl p-6 shadow-md hover:shadow-lg hover:scale-95 cursor-pointer transition duration-150 ease-in-out w-80 relative"
+      className="z-30 flex flex-col bg-white border border-gray-200 rounded-2xl p-6 shadow-md hover:shadow-lg hover:scale-95 cursor-pointer transition duration-150 ease-in-out w-80 relative"
       role="button"
-      tabIndex={0} // Adds keyboard accessibility
+      tabIndex={0}
       onClick={handleClick}
     >
       {/* Image Section */}
@@ -76,117 +127,149 @@ export default function QueueTypeCard({ queueType }: { queueType: QueueType }) {
       </div>
 
       {/* Edit & Delete Buttons */}
-      <div className="absolute top-4 right-4 flex gap-2">
-        <button
-          className="text-blue-500 hover:text-blue-700"
-          onClick={(e: React.MouseEvent) => {
-            e.stopPropagation();
-            setIsEditModalOpen(true);
+      <div
+        className="absolute top-4 right-4 flex gap-2"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Edit Dialog */}
+        <Dialog
+          onOpenChange={(isOpen) => {
+            if (!isOpen) {
+              setEditedData({ ...queueType });
+              setPreviewImage(null);
+              setImageFile(null);
+            }
           }}
         >
-          <Edit size={20} />
-        </button>
-        <button
-          className="text-red-500 hover:text-red-700"
-          onClick={(e: React.MouseEvent) => {
-            e.stopPropagation();
-            Swal.fire({
-              title: "คุณต้องการลบประเภทของคิวนี้ ใช่ไหม?",
-              text: "คุณจะไม่สามารถย้อนกลับได้นะ!",
-              icon: "warning",
-              showCancelButton: true,
-              confirmButtonColor: "#d33",
-              cancelButtonColor: "#3085d6",
-              confirmButtonText: "ใช่, ลบเลย!",
-              cancelButtonText: "ยกเลิก",
-              customClass: {
-                confirmButton: "order-2",
-                cancelButton: "order-1",
-              },
-            }).then((result) => {
-              if (result.isConfirmed) {
-                const formData = new FormData();
-                formData.append("queue_id", queueType.id.toString());
-                formData.append("_action", "deleteQueueType");
-                fetcher.submit(formData, { method: "DELETE" });
-              }
-              validator.revalidate();
-            });
-          }}
-        >
-          <Trash2 size={20} />
-        </button>
-      </div>
-
-      {/* Edit Modal */}
-      {isEditModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-1-">
-          <div className="bg-white p-6 rounded-lg shadow-xl max-w-lg w-full border border-gray-100">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Edit Queue Type</h2>
-              <button onClick={() => setIsEditModalOpen(false)}>
-                <X size={20} />
-              </button>
-            </div>
-            <fetcher.Form
-              method="POST"
-              onSubmit={() => setIsEditModalOpen(false)}
+          <DialogTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-blue-500 hover:text-blue-700"
             >
-              <input type="hidden" name="queue_id" value={queueType.id} />
-              <div className="space-y-2">
-                <label className="block text-sm">Name</label>
-                <input
-                  type="text"
+              <Edit size={20} />
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>แก้ไขประเภทคิว</DialogTitle>
+            </DialogHeader>
+            <fetcher.Form onSubmit={handleSubmit} className="grid gap-4 py-4">
+              {/* Image Upload */}
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="image" className="text-right">
+                  รูปภาพ
+                </Label>
+                <div className="col-span-3">
+                  <Input
+                    id="image"
+                    type="file"
+                    onChange={handleImageChange}
+                    className="w-full"
+                  />
+                  {(previewImage || queueType.image_url) && (
+                    <img
+                      src={previewImage || queueType.image_url}
+                      alt="Preview"
+                      className="mt-2 w-20 h-20 object-cover rounded"
+                    />
+                  )}
+                </div>
+              </div>
+
+              {/* Name */}
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="name" className="text-right">
+                  ชื่อ
+                </Label>
+                <Input
+                  id="name"
                   name="name"
                   value={editedData.name}
                   onChange={handleEditChange}
-                  className="w-full p-2 border rounded-md"
-                  required
+                  className="col-span-3"
                 />
               </div>
-              <div className="space-y-2">
-                <label className="block text-sm">Description</label>
-                <textarea
+
+              {/* Description */}
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="description" className="text-right">
+                  รายละเอียด
+                </Label>
+                <Textarea
+                  id="description"
                   name="description"
-                  rows={3}
                   value={editedData.description}
                   onChange={handleEditChange}
-                  className="w-full p-2 border rounded-md"
-                  required
-                ></textarea>
+                  className="col-span-3"
+                />
               </div>
-              <div className="space-y-2">
-                <label className="block text-sm">Tag</label>
-                <input
-                  type="text"
+
+              {/* Tag */}
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="tag" className="text-right">
+                  แท็ก
+                </Label>
+                <Input
+                  id="tag"
                   name="tag"
                   value={editedData.tag}
                   onChange={handleEditChange}
-                  className="w-full p-2 border rounded-md"
-                  required
+                  className="col-span-3"
                 />
               </div>
-              <div className="flex justify-end gap-2 mt-4">
-                <button
-                  type="button"
-                  className="px-4 py-2 bg-gray-200 rounded"
-                  onClick={() => setIsEditModalOpen(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  name="_action"
-                  value="editQueueType"
-                  className="px-4 py-2 bg-blue-600 text-white rounded"
-                >
-                  Save Changes
-                </button>
+              {/* Buttons */}
+              <div className="flex justify-end space-x-2 mt-4">
+                <DialogClose asChild>
+                  <Button type="button" variant="outline">
+                    ยกเลิก
+                  </Button>
+                </DialogClose>
+                <DialogClose asChild>
+                  <Button type="submit">บันทึก</Button>
+                </DialogClose>
               </div>
             </fetcher.Form>
-          </div>
-        </div>
-      )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Alert Dialog */}
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-red-500 hover:text-red-700"
+            >
+              <Trash2 size={20} />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                คุณต้องการลบประเภทของคิวนี้ ใช่ไหม?
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                คุณจะไม่สามารถย้อนกลับได้นะ!
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>ยกเลิก</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  const formData = new FormData();
+                  formData.append("queue_id", queueType.id.toString());
+                  formData.append("_action", "deleteQueueType");
+                  fetcher.submit(formData, { method: "DELETE" });
+                  validator.revalidate();
+                }}
+              >
+                ลบ
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
     </div>
   );
 }
