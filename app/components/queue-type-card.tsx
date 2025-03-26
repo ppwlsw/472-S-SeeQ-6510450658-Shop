@@ -1,5 +1,5 @@
 import type { QueueType } from "~/repositories/queues-api";
-import { Utensils, Users, Tag, Edit, Trash2, X } from "lucide-react";
+import { Utensils, Users, Tag, Edit, Trash2, X, QrCode } from "lucide-react";
 import { useNavigate, useRevalidator } from "react-router";
 import { useState } from "react";
 import { useFetcher } from "react-router";
@@ -26,6 +26,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "~/components/ui/alert-dialog";
+import { generateQRCode } from "~/utils/generate-qr";
 
 export default function QueueTypeCard({ queueType }: { queueType: QueueType }) {
   const navigate = useNavigate();
@@ -34,6 +35,8 @@ export default function QueueTypeCard({ queueType }: { queueType: QueueType }) {
   const [editedData, setEditedData] = useState<QueueType>({ ...queueType });
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
+  const [qrCodeData, setQrCodeData] = useState<string | null>(null);
 
   const handleClick = () => {
     navigate(`/merchant/queue/${queueType.id}`);
@@ -71,6 +74,23 @@ export default function QueueTypeCard({ queueType }: { queueType: QueueType }) {
     fetcher.submit(formData, { method: "PATCH" });
     validator.revalidate();
   };
+
+  async function handleCreateQrCode() {
+    try {
+      const jsonData = JSON.stringify({
+        action: "q",
+        queue_id: queueType.id,
+      });
+
+      const { qrCodeDataUrl, data } = await generateQRCode(jsonData);
+
+      setQrCodeUrl(qrCodeDataUrl);
+      setQrCodeData(data);
+    } catch (err) {
+      console.error("Error generating QR code:", err);
+      alert("Failed to generate QR code");
+    }
+  }
 
   return (
     <div
@@ -125,6 +145,76 @@ export default function QueueTypeCard({ queueType }: { queueType: QueueType }) {
           <span>Tag: {queueType.tag}</span>
         </div>
       </div>
+
+      {/* QR Code Generation Button */}
+      <div
+        className="absolute top-4 left-4 flex gap-2"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleCreateQrCode();
+        }}
+      >
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-green-500 hover:text-green-700"
+        >
+          <QrCode size={20} />
+        </Button>
+      </div>
+
+      {/* QR Code Modal */}
+      {qrCodeUrl && (
+        <Dialog open={!!qrCodeUrl} onOpenChange={() => setQrCodeUrl(null)}>
+          <DialogContent
+            className="sm:max-w-[425px]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <DialogHeader>
+              <DialogTitle>QR Code for {queueType.name}</DialogTitle>
+            </DialogHeader>
+
+            <div className="flex flex-col items-center">
+              <img
+                src={qrCodeUrl}
+                alt="Queue Type QR Code"
+                className="mb-4 border-4 border-green-500 rounded-lg"
+              />
+
+              {/* //! Delete later */}
+              <div className="bg-gray-100 p-4 rounded-lg w-full">
+                <h3 className="font-medium text-gray-700 mb-2">QR Code Data</h3>
+                <pre className="text-sm text-left bg-white p-2 rounded overflow-x-auto">
+                  {JSON.stringify(JSON.parse(qrCodeData || "{}"), null, 2)}
+                </pre>
+              </div>
+
+              <div className="flex gap-4 mt-4">
+                <Button
+                  onClick={() => {
+                    // Download QR Code
+                    const link = document.createElement("a");
+                    link.download = `${queueType.name}_qr_code.png`;
+                    link.href = qrCodeUrl;
+                    link.click();
+                  }}
+                >
+                  Download
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setQrCodeUrl(null);
+                    setQrCodeData(null);
+                  }}
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* Edit & Delete Buttons */}
       <div
