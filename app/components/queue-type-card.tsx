@@ -137,10 +137,6 @@ export default function QueueTypeCard({ queueType }: { queueType: QueueType }) {
 
       <div className="mt-4 grid grid-cols-2 gap-2 text-sm text-gray-600">
         <div className="flex items-center">
-          <Users className="w-4 h-4 mr-1 text-gray-500" />
-          <span>{queueType.queue_counter} in queue</span>
-        </div>
-        <div className="flex items-center">
           <Tag className="w-4 h-4 mr-1 text-gray-500" />
           <span>Tag: {queueType.tag}</span>
         </div>
