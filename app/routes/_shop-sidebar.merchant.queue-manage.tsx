@@ -89,7 +89,7 @@ function QueueTypeManagePage() {
           <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center mb-6 border-b border-gray-100 pb-3">
               <h2 className="text-xl font-semibold text-gray-800">
-                Create Queue Type
+                สร้างประเภทคิว
               </h2>
               <button
                 onClick={() => {
@@ -173,7 +173,7 @@ function QueueTypeManagePage() {
               {/* Name */}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">
-                  Name
+                  ชื่อ
                 </label>
                 <input
                   type="text"
@@ -187,7 +187,7 @@ function QueueTypeManagePage() {
               {/* Description */}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">
-                  Description
+                  รายละเอียด
                 </label>
                 <textarea
                   name="description"
@@ -201,7 +201,7 @@ function QueueTypeManagePage() {
               {/* Tag */}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">
-                  Tag
+                  แท็ก
                 </label>
                 <input
                   type="text"
@@ -215,15 +215,15 @@ function QueueTypeManagePage() {
               {/* Availability */}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">
-                  Availability
+                  สถานะการรับลูกค้า
                 </label>
                 <select
                   name="is_available"
                   required
                   className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-black focus:border-black transition duration-200 bg-white"
                 >
-                  <option value="true">Available</option>
-                  <option value="false">Not Available</option>
+                  <option value="true">เปิดรับคิว</option>
+                  <option value="false">ไม่เปิดรับคิว</option>
                 </select>
               </div>
 

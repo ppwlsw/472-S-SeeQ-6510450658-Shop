@@ -1,6 +1,5 @@
 import { deleteQueueTypeProvider, queue_provider, setQueueProvider, shop_provider, updateQueueProvider } from "~/provider/provider";
 import { useAuth } from "~/utils/auth";
-import useAxiosInstance from "~/utils/axiosInstance";
 import { prefetchImage } from "~/utils/image-proxy";
 
 export interface QueueType {
@@ -31,12 +30,11 @@ export async function fetchingQueuesType(request: Request, shop_id: number) {
         const { getCookie } = useAuth
         const cookie = await getCookie({ request });
         const token = cookie.token;
-        const response = await fetch(`http://laravel.test/api/queues?shop_id=${shop_id}`, {
+        const response = await fetch(`${process.env.API_BASE_URL}/queues?shop_id=${shop_id}`, {
             headers: {
                 "Authorization": `Bearer ${token}`,
             },
-        });
-        
+        });        
         const data = await response.json();
         const queueTypes = data.data;
         setQueueProvider(shop_id, queueTypes);
@@ -52,9 +50,13 @@ export async function fetchingQueuesType(request: Request, shop_id: number) {
 
 export async function createQueueType(request: Request, payload: FormData) {
     try {
+        console.log("Creating queue type");
+        console.log("Payload : ", payload);
         const { getCookie } = useAuth;
         const data = await getCookie({ request });
+        console.log("Cookie : " , data);
         const token = data.token;
+        console.log("Token : ", token);
         const response = await fetch(`${process.env.API_BASE_URL}/queues`, {
           method: "POST",
           headers: {
@@ -79,7 +81,7 @@ export async function deleteQueueType(request: Request, queue_id: number, shop_i
         const cookie = await getCookie({ request });
         const token = cookie.token;
 
-        const response = await fetch(`http://laravel.test/api/queues/${queue_id}`, {
+        const response = await fetch(`${process.env.API_BASE_URL}/queues/${queue_id}`, {
             headers: {
                 "Authorization": `Bearer ${token}`,
             },
@@ -102,7 +104,7 @@ export async function updateQueueType(request: Request, queue_id: number, payloa
         const { getCookie } = useAuth;
         const cookie = await getCookie({ request });
         const token = cookie.token;
-        const response = await fetch(`http://laravel.test/api/queues/${queue_id}`, {
+        const response = await fetch(`${process.env.API_BASE_URL}/queues/${queue_id}`, {
             headers: {
                 "Authorization": `Bearer ${token}`,
                 "Content-Type": "application/json"
@@ -125,7 +127,7 @@ export async function fetchQueueDetail(request: Request, queue_id: number) {
         const { getCookie } = useAuth;
         const cookie = await getCookie({ request });
         const token = cookie.token;
-        const response = await fetch(`http://laravel.test/api/queues/${queue_id}`, {
+        const response = await fetch(`${process.env.API_BASE_URL}/queues/${queue_id}`, {
             headers: {
                 "Authorization": `Bearer ${token}`,
             },
@@ -146,7 +148,7 @@ export async function fetchCustomerInQueue(request: Request, shop_id: number) {
         const { getCookie } = useAuth;
         const cookie = await getCookie({ request });
         const token = cookie.token;
-        const response = await fetch(`http://laravel.test/api/queues/${shop_id}/getAllQueue`, {
+        const response = await fetch(`${process.env.API_BASE_URL}/queues/${shop_id}/getAllQueue`, {
             headers: {
                 "Authorization": `Bearer ${token}`,
             },
@@ -168,7 +170,7 @@ export async function skipQueue(request : Request, queue_id: number ) {
         const { getCookie } = useAuth;
         const cookie = await getCookie({ request });
         const token = cookie.token;
-        const response = await fetch(`http://laravel.test/api/queues/${queue_id}/cancel`, {
+        const response = await fetch(`${process.env.API_BASE_URL}/queues/${queue_id}/cancel`, {
             headers: {
                 "Authorization": `Bearer ${token}`,
             },
@@ -188,7 +190,7 @@ export async function nextQueue(request : Request, queue_id: number ) {
         const { getCookie } = useAuth;
         const cookie = await getCookie({ request });
         const token = cookie.token;
-        const response = await fetch(`http://laravel.test/api/queues/${queue_id}/next`, {
+        const response = await fetch(`${process.env.API_BASE_URL}/queues/${queue_id}/next`, {
             headers: {
                 "Authorization": `Bearer ${token}`,
             },
@@ -209,7 +211,7 @@ export async function changeQueueStatus(request: Request, queue_id: number, stat
         const { getCookie } = useAuth;
         const cookie = await getCookie({ request });
         const token = cookie.token;
-        const response = await fetch(`http://laravel.test/api/queues/${queue_id}`, {
+        const response = await fetch(`${process.env.API_BASE_URL}/queues/${queue_id}`, {
             headers: {
                 "Authorization": `Bearer ${token}`,
                 "Content-Type": "application/json"

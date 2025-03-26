@@ -37,6 +37,10 @@ function ReminderCard({ id, title, time, description }: ReminderCardProps) {
       cancelButtonColor: "#d1d5db",
       confirmButtonText: "ใช่, เสร็จสิ้นแล้ว!",
       cancelButtonText: "ยกเลิก",
+      customClass: {
+        confirmButton: "order-2",
+        cancelButton: "order-1",
+      },
     }).then((result) => {
       if (result.isConfirmed) {
         // Submit the form programmatically

@@ -41,7 +41,6 @@ interface QueueType {
   updated_at: Date;
 }
 
-
 let shop_provider: Record<number, Shop> = {};
 
 let reminder_provider: Record<number, Reminder[]> = {};
@@ -49,8 +48,13 @@ let reminder_provider: Record<number, Reminder[]> = {};
 let queue_provider: Record<number, QueueType[]> = {};
 
 async function setShopProvider(user_id: number, shop: Shop) {
-  const image_url = await prefetchImage(shop.image_url ?? "");
-  shop.image_url = image_url
+  try {
+    const image_url = await prefetchImage(shop.image_url ?? "");
+    shop.image_url = image_url;
+  } catch (error) {
+    shop.image_url = "";
+    console.error(error);
+  }
   shop_provider[user_id] = shop;
 }
 
@@ -68,7 +72,9 @@ function setShopReminder(shop_id: number, reminder: Reminder) {
 async function setQueueProvider(shop_id: number, queueTypes: QueueType[]) {
   queue_provider[shop_id] = queueTypes;
   for (let i = 0; i < queue_provider[shop_id].length; i++) {
-    const image_url = await prefetchImage(queue_provider[shop_id][i].image_url ?? "");
+    const image_url = await prefetchImage(
+      queue_provider[shop_id][i].image_url ?? ""
+    );
     queue_provider[shop_id][i].image_url = image_url;
   }
 }
@@ -76,12 +82,21 @@ async function setQueueProvider(shop_id: number, queueTypes: QueueType[]) {
 async function updateQueueProvider(shop_id: number, queueType: QueueType) {
   const image_url = await prefetchImage("");
   queueType.image_url = image_url;
-  queue_provider[shop_id].push(queueType); 
+  queue_provider[shop_id].push(queueType);
 }
 
 function deleteQueueTypeProvider(shop_id: number, queueType_id: number) {
-  queue_provider[shop_id] = queue_provider[shop_id].filter(queue => queue.id !== queueType_id);
+  queue_provider[shop_id] = queue_provider[shop_id].filter(
+    (queue) => queue.id !== queueType_id
+  );
 }
 
-export { shop_provider, reminder_provider, queue_provider};
-export { setShopProvider, setShopReminder, updateShopOpenStatus, setQueueProvider , deleteQueueTypeProvider, updateQueueProvider};
+export { shop_provider, reminder_provider, queue_provider };
+export {
+  setShopProvider,
+  setShopReminder,
+  updateShopOpenStatus,
+  setQueueProvider,
+  deleteQueueTypeProvider,
+  updateQueueProvider,
+};

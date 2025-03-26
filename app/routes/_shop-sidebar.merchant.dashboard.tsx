@@ -18,33 +18,47 @@ import { type LoaderFunctionArgs } from "react-router";
 import { reminder_provider, shop_provider } from "~/provider/provider";
 import { fetchingShopReminders } from "~/repositories/reminder-api";
 import { useAuth } from "~/utils/auth";
-import { fetchShopStat } from "~/repositories/shop-api";
+import { fetchingShopData, fetchShopStat } from "~/repositories/shop-api";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { getCookie } = useAuth;
   const data = await getCookie({ request });
-
   const user_id = data.user_id;
-  const shop_id = shop_provider[user_id]?.id;
-
-  if (!shop_id) {
-    return {
-      shop: null,
-      reminders: [],
-      stats: null,
-      user_in_queues: [],
-      shop_id: null,
-    };
-  }
 
   try {
+    await fetchingShopData(user_id, request);
+    const shop_id = shop_provider[user_id]?.id;
+
+    if (!shop_id) {
+      return {
+        shop: null,
+        reminders: [],
+        stats: null,
+        user_in_queues: [],
+        shop_id: null,
+      };
+    }
     await fetchingShopReminders(shop_id, request);
     const stats = await fetchShopStat(shop_id, request);
+    console.log("STATS", stats);
+    if (stats != undefined) {
+      if (stats.shop_stat.length == 0) {
+        stats.shop_stat = [
+          {
+            total_queues: 0,
+            waiting_count: 0,
+            completed_count: 0,
+            canceled_count: 0,
+          },
+        ];
+      }
+    }
+    console.log("Stat after : ");
 
     return {
       shop: shop_provider[user_id] || null,
       reminders: reminder_provider[shop_id] || [],
-      stats: stats?.shop_stat || null,
+      stats: stats.shop_stat || null,
       user_in_queues: stats?.users_in_queues || [],
       shop_id: shop_id,
     };
@@ -52,20 +66,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     console.error("Error fetching shop reminders:", e);
   }
 
-  return {
-    shop: shop_provider[user_id] || null,
-    reminders: reminder_provider[shop_id] || [],
-    stats: [
-      {
-        total_queues: 0,
-        waiting_count: 0,
-        completed_count: 0,
-        canceled_count: 0,
-      },
-    ],
-    user_in_queues: [],
-    shop_id: shop_id,
-  };
+  return {};
 }
 
 // Mock Stacked Bar Chart Data
@@ -92,22 +93,22 @@ function DashboardPage() {
   const statCards = [
     {
       title: "Total Queues",
-      value: stats[0]?.total_queues || 0,
+      value: stats != undefined ? stats[0]?.total_queues : 0,
       icon: <Users size={24} className="text-indigo-600" />,
     },
     {
       title: "Waiting",
-      value: stats[0]?.waiting_count || 0,
+      value: stats != undefined ? stats[0]?.waiting_count : 0,
       icon: <Clock size={24} className="text-amber-600" />,
     },
     {
       title: "Completed",
-      value: stats[0]?.completed_count || 0,
+      value: stats != undefined ? stats[0]?.completed_count : 0,
       icon: <CalendarCheck size={24} className="text-green-600" />,
     },
     {
       title: "Canceled",
-      value: stats[0]?.canceled_count || 0,
+      value: stats != undefined ? stats[0]?.canceled_count : 0,
       icon: <XCircle size={24} className="text-red-600" />,
     },
   ];

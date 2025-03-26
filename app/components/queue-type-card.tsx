@@ -91,13 +91,14 @@ export default function QueueTypeCard({ queueType }: { queueType: QueueType }) {
           onClick={(e: React.MouseEvent) => {
             e.stopPropagation();
             Swal.fire({
-              title: "Are you sure?",
-              text: "You won't be able to revert this!",
+              title: "คุณต้องการลบประเภทของคิวนี้ ใช่ไหม?",
+              text: "คุณจะไม่สามารถย้อนกลับได้นะ!",
               icon: "warning",
               showCancelButton: true,
               confirmButtonColor: "#d33",
               cancelButtonColor: "#3085d6",
-              confirmButtonText: "Yes, delete it!",
+              confirmButtonText: "ใช่, ลบเลย!",
+              cancelButtonText: "ยกเลิก",
               customClass: {
                 confirmButton: "order-2",
                 cancelButton: "order-1",

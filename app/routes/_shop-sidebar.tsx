@@ -126,7 +126,7 @@ const MerchantNav = () => {
               <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center border-[1px] overflow-hidden">
                 {shop?.image_url ? (
                   <img
-                    src={shop.image_url}
+                    src={shop?.image_url}
                     className="object-cover w-full h-full "
                   />
                 ) : (
@@ -137,7 +137,7 @@ const MerchantNav = () => {
                 )}
               </div>
               <div className="flex flex-col">
-                <span className="text-sm font-medium">{shop.name}</span>
+                <span className="text-sm font-medium">{shop?.name}</span>
               </div>
             </div>
           </div>

@@ -13,7 +13,7 @@ export async function fetchingShopData(user_id : number, request: Request) {
     try {
         const { getCookie } = useAuth;
         const data = await getCookie({request})
-        const token = data.token;
+        const token = data?.token;
         const res = await fetch(`${process.env.API_BASE_URL}/users/${user_id}/shop`, {
           method: "GET",
           headers: {
@@ -21,7 +21,6 @@ export async function fetchingShopData(user_id : number, request: Request) {
           },
         });
         const shop = await res.json();
-
         await setShopProvider(user_id, shop.data);
 
       } catch (error) {

@@ -85,11 +85,12 @@ export default function RemindersPage() {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+        <div className="fixed z-10 inset-0 flex items-center justify-center bg-black/50">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold">Create Reminder</h2>
               <button
+                className="cursor-pointer"
                 onClick={() => {
                   setIsModalOpen(false);
                   validator.revalidate();
@@ -139,7 +140,7 @@ export default function RemindersPage() {
               <div className="flex justify-end space-x-2">
                 <button
                   type="button"
-                  className="px-4 py-2 bg-gray-300 rounded"
+                  className="px-4 py-2 bg-gray-300 rounded cursor-pointer"
                   onClick={() => setIsModalOpen(false)}
                 >
                   Cancel
@@ -148,7 +149,7 @@ export default function RemindersPage() {
                   name="_action"
                   value="createReminder"
                   type="submit"
-                  className="px-4 py-2 bg-black text-white rounded"
+                  className="px-4 py-2 bg-black text-white rounded cursor-pointer"
                 >
                   Create
                 </button>

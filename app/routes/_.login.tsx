@@ -14,7 +14,6 @@ import {
   useAuth,
 } from "~/utils/auth";
 import { motion } from "framer-motion";
-import { fetchingShopData } from "~/repositories/shop-api";
 import LoadingIndicator from "~/components/loading-indicator";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -74,7 +73,7 @@ export async function action({ request }: ActionFunctionArgs) {
       role: role,
     });
 
-    await fetchingShopData(user_id, request);
+    // await fetchingShopData(user_id, request);
 
     return redirect("/merchant/dashboard", {
       headers: {
