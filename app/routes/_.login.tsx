@@ -1,6 +1,7 @@
 import { CircleX, Eye, EyeClosed, Store } from "lucide-react";
 import { useState } from "react";
 import {
+  Link,
   redirect,
   useFetcher,
   type ActionFunctionArgs,
@@ -189,6 +190,15 @@ function LoginFetcherForm() {
         >
           เข้าสู่ระบบ
         </button>
+        <div>
+          <Link
+            to="/forget-password"
+            prefetch="render"
+            className="text-primary-dark"
+          >
+            ลืมรหัสผ่านรึป่าว?
+          </Link>
+        </div>
       </div>
     </fetcher.Form>
   );

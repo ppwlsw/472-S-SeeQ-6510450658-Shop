@@ -4,14 +4,14 @@ import { useAuth } from "./auth";
 
 function useAxiosInstance(
     request: Request,
-    options: { raw?: boolean; without_token?: boolean; custom_token?:string } = {}
+    options: { raw?: boolean; without_token?: boolean; custom_token?:string; isFormData?:boolean; } = {}
 ): AxiosInstance {
-    const { raw = false, without_token = false, custom_token="" } = options;
+    const { raw = false, without_token = false, custom_token="", isFormData = false } = options;
 
     const axiosInstance: AxiosInstance = axios.create({
         baseURL: process.env.API_BASE_URL,
         headers: {
-            "Content-Type": process.env.CONTENT_TYPE || "application/json",
+            "Content-Type": process.env.CONTENT_TYPE || isFormData?"multipart/form-data":"application/json",
             "X-Content-Type-Options": "nosniff",
         },
         timeout: 10000,
