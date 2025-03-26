@@ -82,20 +82,15 @@ async function setQueueProvider(shop_id: number, queueTypes: QueueType[]) {
 async function updateQueueProvider(shop_id: number, queueType: QueueType) {
   console.log("This Shop Queue Provider : ", queue_provider[shop_id]);
 
-  // Check if the queueType already exists
   const index = queue_provider[shop_id].findIndex(queue => queue.id === queueType.id);
 
   const image_url = await prefetchImage(queueType.image_url ?? "");
   queueType.image_url = image_url;
 
   if (index === -1) {
-    // If it doesn't exist, push the new queueType
     queue_provider[shop_id].push(queueType);
-    console.log("This Shop Queue Provider [After Push]: ", queue_provider[shop_id]);
   } else {
-    // If it exists, update the existing queueType
     queue_provider[shop_id][index] = queueType;
-    console.log("This Shop Queue Provider [After Update]: ", queue_provider[shop_id]);
   }
 }
 
