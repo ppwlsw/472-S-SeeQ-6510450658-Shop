@@ -101,6 +101,8 @@ export async function deleteQueueType(request: Request, queue_id: number, shop_i
 
 export async function updateQueueType(request: Request, queue_id: number, payload: FormData) {
     try {
+        console.log("Updating queue type");
+        console.log("Payload : ", payload);
         const { getCookie } = useAuth;
         const cookie = await getCookie({ request });
         const token = cookie.token;

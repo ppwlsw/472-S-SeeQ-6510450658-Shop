@@ -37,6 +37,7 @@ export default function QueueTypeCard({ queueType }: { queueType: QueueType }) {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
   const [qrCodeData, setQrCodeData] = useState<string | null>(null);
+  const [isDialogOpen, setDialogOpen] = useState(false);
 
   const handleClick = () => {
     navigate(`/merchant/queue/${queueType.id}`);
@@ -219,6 +220,7 @@ export default function QueueTypeCard({ queueType }: { queueType: QueueType }) {
       >
         {/* Edit Dialog */}
         <Dialog
+          open={isDialogOpen}
           onOpenChange={(isOpen) => {
             if (!isOpen) {
               setEditedData({ ...queueType });
@@ -229,6 +231,9 @@ export default function QueueTypeCard({ queueType }: { queueType: QueueType }) {
         >
           <DialogTrigger asChild>
             <Button
+              onClick={() => {
+                setDialogOpen(true);
+              }}
               variant="ghost"
               size="icon"
               className="text-blue-500 hover:text-blue-700"
@@ -311,9 +316,14 @@ export default function QueueTypeCard({ queueType }: { queueType: QueueType }) {
                     ยกเลิก
                   </Button>
                 </DialogClose>
-                <DialogClose asChild>
-                  <Button type="submit">บันทึก</Button>
-                </DialogClose>
+                <Button
+                  onClick={() => {
+                    setDialogOpen(false);
+                  }}
+                  type="submit"
+                >
+                  บันทึก
+                </Button>
               </div>
             </fetcher.Form>
           </DialogContent>
