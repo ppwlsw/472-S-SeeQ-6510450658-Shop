@@ -6,9 +6,13 @@
       "dependencies": {
         "@radix-ui/react-alert-dialog": "^1.1.6",
         "@radix-ui/react-dialog": "^1.1.6",
+<<<<<<< HEAD
         "@radix-ui/react-label": "^2.1.2",
         "@radix-ui/react-scroll-area": "^1.2.3",
         "@radix-ui/react-select": "^2.1.6",
+=======
+        "@radix-ui/react-scroll-area": "^1.2.3",
+>>>>>>> c692b2c379094383f1553c9f33b82ecb4bd56952
         "@radix-ui/react-slot": "^1.1.2",
         "@react-router/fs-routes": "^7.2.0",
         "@react-router/node": "^7.2.0",

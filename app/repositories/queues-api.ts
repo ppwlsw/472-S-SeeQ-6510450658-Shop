@@ -50,13 +50,9 @@ export async function fetchingQueuesType(request: Request, shop_id: number) {
 
 export async function createQueueType(request: Request, payload: FormData) {
     try {
-        console.log("Creating queue type");
-        console.log("Payload : ", payload);
         const { getCookie } = useAuth;
         const data = await getCookie({ request });
-        console.log("Cookie : " , data);
         const token = data.token;
-        console.log("Token : ", token);
         const response = await fetch(`${process.env.API_BASE_URL}/queues`, {
           method: "POST",
           headers: {
@@ -68,7 +64,7 @@ export async function createQueueType(request: Request, payload: FormData) {
         const image_url = await prefetchImage(res.data.image_url ?? "");
         res.data.image_url = image_url;
         updateQueueProvider(res.data.shop_id, res.data);
-
+        
 
     } catch (e) {
         console.error("error creating queue type : ", e);

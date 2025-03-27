@@ -40,6 +40,7 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
+import CustomLegend from "~/components/custom-legend";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { getCookie } = useAuth;
@@ -159,10 +160,12 @@ function DashboardPage() {
     <div className="flex flex-col gap-6 h-full overflow-y-auto">
       {/* Header with QR Code Generation */}
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
-        <Button onClick={handleCreateQrCode}>
+        <Button
+          onClick={handleCreateQrCode}
+          className="cursor-pointer active:scale-95 transition-transform duration-300"
+        >
           <QrCodeIcon className="mr-2 h-4 w-4" />
-          Generate Shop QR Code
+          สร้าง QR Code ของร้านค้าของคุณ
         </Button>
       </div>
 
@@ -199,7 +202,7 @@ function DashboardPage() {
             <XAxis dataKey="name" />
             <YAxis />
             <Tooltip />
-            <Legend />
+            <Legend content={<CustomLegend />} />
             <Bar dataKey="waiting_count" stackId="a" fill="#fbbf24" />
             <Bar dataKey="completed_count" stackId="a" fill="#34d399" />
             <Bar dataKey="canceled_count" stackId="a" fill="#ef4444" />
@@ -277,7 +280,7 @@ function DashboardPage() {
       <Dialog open={!!qrCodeUrl} onOpenChange={() => setQrCodeUrl(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Your Shop QR Code</DialogTitle>
+            <DialogTitle>นี่คือ QR Code สำหรับร้านค้าคุณ </DialogTitle>
           </DialogHeader>
 
           {qrCodeUrl && (
@@ -289,27 +292,6 @@ function DashboardPage() {
                   className="mx-auto mb-4 border-4 border-blue-500 rounded-lg max-w-full"
                 />
               </div>
-
-              {/* QR Code Data (for debugging) */}
-              <Card className="mt-4">
-                <CardHeader>
-                  <CardTitle>QR Code Data</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <pre className="text-sm text-left bg-muted p-2 rounded overflow-x-auto">
-                    {JSON.stringify(JSON.parse(qrCodeData || "{}"), null, 2)}
-                  </pre>
-                </CardContent>
-              </Card>
-
-              <DialogFooter className="sm:justify-start">
-                <Button variant="outline" onClick={handleDownloadQRCode}>
-                  Download
-                </Button>
-                <Button variant="secondary" onClick={() => setQrCodeUrl(null)}>
-                  Close
-                </Button>
-              </DialogFooter>
             </>
           )}
         </DialogContent>

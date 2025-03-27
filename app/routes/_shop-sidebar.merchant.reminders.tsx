@@ -18,6 +18,20 @@ import {
 } from "~/repositories/reminder-api";
 import { useAuth } from "~/utils/auth";
 
+// Shadcn UI Imports
+import { Button } from "~/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "~/components/ui/dialog";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import { Textarea } from "~/components/ui/textarea";
+
 export async function loader({ request }: LoaderFunctionArgs) {
   const { getCookie } = useAuth;
   const data = await getCookie({ request });
@@ -64,100 +78,78 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function RemindersPage() {
   const { reminders, shop } = useLoaderData<typeof loader>();
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const fetcher = useFetcher();
   const validator = useRevalidator();
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <div className="max-w-full mx-auto p-4 relative">
       {/* Add button */}
       <div className="flex flex-row justify-end my-4">
-        <button
-          className="bg-white rounded-full p-3
-          border border-black shadow-md
-          hover:bg-black hover:text-white hover:border-white active:scale-90 
-          transition"
-          onClick={() => setIsModalOpen(true)}
-        >
-          <Plus />
-        </button>
-      </div>
-
-      {/* Modal */}
-      {isModalOpen && (
-        <div className="fixed z-10 inset-0 flex items-center justify-center bg-black/50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold">Create Reminder</h2>
-              <button
-                className="cursor-pointer"
-                onClick={() => {
-                  setIsModalOpen(false);
-                  validator.revalidate();
-                }}
-              >
-                <X className="w-6 h-6" />
-              </button>
-            </div>
+        <Dialog open={isOpen}>
+          <DialogTrigger asChild>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setIsOpen(true)}
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create Reminder</DialogTitle>
+            </DialogHeader>
 
             <fetcher.Form
               method="POST"
               className="space-y-4"
-              onSubmit={() => {
-                setIsModalOpen(false);
-              }}
+              onSubmit={() => validator.revalidate()}
             >
-              <div>
-                <label className="block text-sm font-medium">Title</label>
-                <input
-                  type="text"
-                  name="title"
-                  required
-                  className="w-full p-2 border border-gray-300 rounded"
-                />
+              <div className="space-y-2">
+                <Label htmlFor="title">Title</Label>
+                <Input id="title" name="title" required />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium">Description</label>
-                <textarea
+              <div className="space-y-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
                   name="description"
                   rows={3}
                   required
-                  className="w-full p-2 border border-gray-300 rounded"
-                ></textarea>
+                />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium">Date & Time</label>
-                <input
+              <div className="space-y-2">
+                <Label htmlFor="dateTime">Date & Time</Label>
+                <Input
+                  id="dateTime"
                   type="datetime-local"
                   name="dateTime"
                   required
-                  className="w-full p-2 border border-gray-300 rounded"
                 />
               </div>
 
               <div className="flex justify-end space-x-2">
-                <button
-                  type="button"
-                  className="px-4 py-2 bg-gray-300 rounded cursor-pointer"
-                  onClick={() => setIsModalOpen(false)}
-                >
-                  Cancel
-                </button>
-                <button
+                <DialogClose asChild>
+                  <Button type="button" variant="outline">
+                    Cancel
+                  </Button>
+                </DialogClose>
+                <Button
+                  type="submit"
                   name="_action"
                   value="createReminder"
-                  type="submit"
-                  className="px-4 py-2 bg-black text-white rounded cursor-pointer"
+                  onClick={() => setIsOpen(false)}
                 >
                   Create
-                </button>
+                </Button>
               </div>
             </fetcher.Form>
-          </div>
-        </div>
-      )}
+          </DialogContent>
+        </Dialog>
+      </div>
 
       {/* Reminder List */}
       {reminders.length > 0 ? (
