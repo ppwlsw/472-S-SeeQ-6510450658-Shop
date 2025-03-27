@@ -113,7 +113,7 @@ const MerchantNav = () => {
               />
               <LogoutModal isPoping={isPoping} setIsPoping={setIsPoping} />
               <button
-                className="flex flex-row justify-start items-center px-6 py-2 mx-4 gap-4 border-[1px] border-transparent hover:text-red-600 hover:border-red-600 hover:scale-105 duration-300 rounded-md"
+                className="flex flex-row justify-start items-center px-6 py-2 mx-4 gap-4 border-[1px] border-transparent hover:text-red-600 hover:border-red-600 hover:scale-105 duration-300 rounded-md cursor-pointer"
                 onClick={() => {
                   setIsPoping(true);
                 }}
