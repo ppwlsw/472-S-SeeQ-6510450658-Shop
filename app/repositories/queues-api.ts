@@ -113,7 +113,7 @@ export async function updateQueueType(request: Request, queue_id: number, payloa
         
         const data = await response.json();
 
-        console.log("Data : ", data);
+
 
         delete data.data.shop
         const queueTypePayload : QueueType = data.data;
@@ -226,8 +226,10 @@ export async function changeQueueStatus(request: Request, queue_id: number, stat
             })
         });
 
-
         const data = await response.json();
+        delete data.data.shop
+        const queueTypePayload : QueueType = data.data;
+        updateQueueProvider(queueTypePayload.shop_id, queueTypePayload);
         return data;
 
     } catch (error) {
