@@ -177,37 +177,6 @@ export default function QueueTypeCard({ queueType }: { queueType: QueueType }) {
                 alt="Queue Type QR Code"
                 className="mb-4 border-4 border-green-500 rounded-lg"
               />
-
-              {/* //! Delete later */}
-              <div className="bg-gray-100 p-4 rounded-lg w-full">
-                <h3 className="font-medium text-gray-700 mb-2">QR Code Data</h3>
-                <pre className="text-sm text-left bg-white p-2 rounded overflow-x-auto">
-                  {JSON.stringify(JSON.parse(qrCodeData || "{}"), null, 2)}
-                </pre>
-              </div>
-
-              <div className="flex gap-4 mt-4">
-                <Button
-                  onClick={() => {
-                    // Download QR Code
-                    const link = document.createElement("a");
-                    link.download = `${queueType.name}_qr_code.png`;
-                    link.href = qrCodeUrl;
-                    link.click();
-                  }}
-                >
-                  Download
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setQrCodeUrl(null);
-                    setQrCodeData(null);
-                  }}
-                >
-                  Close
-                </Button>
-              </div>
             </div>
           </DialogContent>
         </Dialog>
@@ -241,7 +210,7 @@ export default function QueueTypeCard({ queueType }: { queueType: QueueType }) {
               <Edit size={20} />
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="sm:max-w-[425px] [&>button]:hidden">
             <DialogHeader>
               <DialogTitle>แก้ไขประเภทคิว</DialogTitle>
             </DialogHeader>
@@ -312,7 +281,11 @@ export default function QueueTypeCard({ queueType }: { queueType: QueueType }) {
               {/* Buttons */}
               <div className="flex justify-end space-x-2 mt-4">
                 <DialogClose asChild>
-                  <Button type="button" variant="outline">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setDialogOpen(false)}
+                  >
                     ยกเลิก
                   </Button>
                 </DialogClose>
