@@ -72,7 +72,10 @@ export default function QueueTypeCard({ queueType }: { queueType: QueueType }) {
       formData.append("image", imageFile);
     }
 
-    fetcher.submit(formData, { method: "PATCH" });
+    fetcher.submit(formData, {
+      method: "POST",
+      encType: "multipart/form-data",
+    });
     validator.revalidate();
   };
 
@@ -214,7 +217,12 @@ export default function QueueTypeCard({ queueType }: { queueType: QueueType }) {
             <DialogHeader>
               <DialogTitle>แก้ไขประเภทคิว</DialogTitle>
             </DialogHeader>
-            <fetcher.Form onSubmit={handleSubmit} className="grid gap-4 py-4">
+            <fetcher.Form
+              onSubmit={handleSubmit}
+              method="POST"
+              encType="multipart/form-data"
+              className="grid gap-4 py-4"
+            >
               {/* Image Upload */}
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="image" className="text-right">
@@ -223,10 +231,11 @@ export default function QueueTypeCard({ queueType }: { queueType: QueueType }) {
                 <div className="col-span-3">
                   <Input
                     id="image"
+                    name="image"
                     type="file"
                     onChange={handleImageChange}
-                    className="w-full"
                   />
+
                   {(previewImage || queueType.image_url) && (
                     <img
                       src={previewImage || queueType.image_url}

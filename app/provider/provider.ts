@@ -86,10 +86,14 @@ async function updateQueueProvider(shop_id: number, queueType: QueueType) {
   queueType.image_url = image_url;
 
   if (index === -1) {
+    console.log("IT'S A NEW QUEUE TYPE - PUSHING : ", queueType);
     queue_provider[shop_id].push(queueType);
   } else {
+    console.log("IT'S AN EXISTING QUEUE TYPE - UPDATING : ", queueType);
     queue_provider[shop_id][index] = queueType;
   }
+
+
 }
 
 function deleteQueueTypeProvider(shop_id: number, queueType_id: number) {

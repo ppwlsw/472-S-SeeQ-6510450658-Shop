@@ -17,6 +17,7 @@ interface ReservationCardProps {
 function ReservationCard({ name, table, status, phone }: ReservationCardProps) {
   // Status styling logic with enhanced colors and capitalization
   const getStatusStyles = (status: string) => {
+    console.log(status);
     switch (status.toLowerCase()) {
       case "completed":
         return {

@@ -57,12 +57,13 @@ export async function createQueueType(request: Request, payload: FormData) {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${token}`,
+            "Accept" : "application/json"
           },
           body: payload, 
         });
         const res = await response.json();
-        const image_url = await prefetchImage(res.data.image_url ?? "");
-        res.data.image_url = image_url;
+        
+       
         updateQueueProvider(res.data.shop_id, res.data);
         
 
@@ -97,20 +98,23 @@ export async function deleteQueueType(request: Request, queue_id: number, shop_i
 
 export async function updateQueueType(request: Request, queue_id: number, payload: FormData) {
     try {
-        console.log("Updating queue type");
-        console.log("Payload : ", payload);
+
         const { getCookie } = useAuth;
         const cookie = await getCookie({ request });
         const token = cookie.token;
+        console.log("Payload : ", payload);
         const response = await fetch(`${process.env.API_BASE_URL}/queues/${queue_id}`, {
             headers: {
-                "Authorization": `Bearer ${token}`,
-                "Content-Type": "application/json"
+            "Authorization": `Bearer ${token}`,
             },
-            method : "PATCH",
-            body : JSON.stringify(payload)
+            method : "POST",
+            body : payload
         });
+        
         const data = await response.json();
+
+        console.log("Data : ", data);
+
         delete data.data.shop
         const queueTypePayload : QueueType = data.data;
         updateQueueProvider(queueTypePayload.shop_id, queueTypePayload);
