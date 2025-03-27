@@ -80,8 +80,6 @@ async function setQueueProvider(shop_id: number, queueTypes: QueueType[]) {
 }
 
 async function updateQueueProvider(shop_id: number, queueType: QueueType) {
-  console.log("This Shop Queue Provider : ", queue_provider[shop_id]);
-
   const index = queue_provider[shop_id].findIndex(queue => queue.id === queueType.id);
 
   const image_url = await prefetchImage(queueType.image_url ?? "");

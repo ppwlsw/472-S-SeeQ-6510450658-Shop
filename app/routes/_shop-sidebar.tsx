@@ -4,7 +4,7 @@ import {
   UsersRound,
   Pencil,
   Bell,
-  Store,
+  ShoppingCart,
   LogOut,
 } from "lucide-react";
 import { SidebarItem } from "~/components/sidebar-item";
@@ -49,6 +49,8 @@ const MerchantNav = () => {
       return "จัดการร้านค้า";
     } else if (location.pathname.startsWith("/merchant/reminders")) {
       return "การแจ้งเตือน";
+    } else if (location.pathname.startsWith("/merchant/items")) {
+      return "รายการสินค้า";
     } else {
       return "ภาพรวมร้านค้า";
     }
@@ -86,14 +88,16 @@ const MerchantNav = () => {
                 label="จัดการคิว"
                 paths={["/merchant/queue-manage", "/merchant/queue"]}
               />
-
-              <div className="flex flex-col mb-4">
-                <SidebarItem
-                  icon={<Bell className="w-5 h-5" />}
-                  label="การแจ้งเตือน"
-                  paths={["/merchant/reminders"]}
-                />
-              </div>
+              <SidebarItem
+                icon={<Bell className="w-5 h-5" />}
+                label="การแจ้งเตือน"
+                paths={["/merchant/reminders"]}
+              />
+              <SidebarItem
+                icon={<ShoppingCart className="w-5 h-5" />}
+                label="รายการสินค้า"
+                paths={["/merchant/items"]}
+              />
             </div>
 
             <div className="flex flex-col mb-4 gap-3 mt-auto">
