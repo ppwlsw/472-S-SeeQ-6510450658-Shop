@@ -10,7 +10,6 @@ import {
 } from "react-router";
 import { shop_provider } from "~/provider/provider";
 import { useAuth } from "~/utils/auth";
-import { prefetchImage } from "~/utils/image-proxy";
 
 interface item {
   name: string;
@@ -25,7 +24,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const auth = await getCookie({ request: request });
   const user_id = auth.user_id;
   const shop_id = shop_provider[user_id].id;
-  console.log("SHOP ID : ", shop_id);
   const responseApiUrl = await fetch(
     `${process.env.API_BASE_URL}/shops/${shop_id}/item`,
     {

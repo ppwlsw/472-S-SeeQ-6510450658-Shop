@@ -334,7 +334,7 @@ function ShopManagePage() {
                   htmlFor="address"
                   className="font-medium flex items-center gap-2 text-gray-700 mb-2"
                 >
-                  <MapPin size={16} className="text-blue-600" /> ที่ิอยู่
+                  <MapPin size={16} className="text-blue-600" /> ที่อยู่
                 </label>
                 <input
                   id="address"

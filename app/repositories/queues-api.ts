@@ -1,6 +1,5 @@
 import { deleteQueueTypeProvider, queue_provider, setQueueProvider, shop_provider, updateQueueProvider } from "~/provider/provider";
 import { useAuth } from "~/utils/auth";
-import { prefetchImage } from "~/utils/image-proxy";
 
 export interface QueueType {
     id: number;
