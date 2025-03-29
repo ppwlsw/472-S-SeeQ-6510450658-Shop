@@ -1,5 +1,3 @@
-import { prefetchImage } from "~/utils/image-proxy";
-
 interface Shop {
   id: number;
   name: string;
@@ -48,13 +46,6 @@ let reminder_provider: Record<number, Reminder[]> = {};
 let queue_provider: Record<number, QueueType[]> = {};
 
 async function setShopProvider(user_id: number, shop: Shop) {
-  try {
-    const image_url = await prefetchImage(shop.image_url ?? "");
-    shop.image_url = image_url;
-  } catch (error) {
-    shop.image_url = "";
-    console.error(error);
-  }
   shop_provider[user_id] = shop;
 }
 
@@ -71,27 +62,20 @@ function setShopReminder(shop_id: number, reminder: Reminder) {
 
 async function setQueueProvider(shop_id: number, queueTypes: QueueType[]) {
   queue_provider[shop_id] = queueTypes;
-  for (let i = 0; i < queue_provider[shop_id].length; i++) {
-    const image_url = await prefetchImage(
-      queue_provider[shop_id][i].image_url ?? ""
-    );
-    queue_provider[shop_id][i].image_url = image_url;
-  }
 }
 
 async function updateQueueProvider(shop_id: number, queueType: QueueType) {
-  console.log("This Shop Queue Provider : ", queue_provider[shop_id]);
-
   const index = queue_provider[shop_id].findIndex(queue => queue.id === queueType.id);
 
-  const image_url = await prefetchImage(queueType.image_url ?? "");
-  queueType.image_url = image_url;
-
   if (index === -1) {
+    console.log("IT'S A NEW QUEUE TYPE - PUSHING : ", queueType);
     queue_provider[shop_id].push(queueType);
   } else {
+    console.log("IT'S AN EXISTING QUEUE TYPE - UPDATING : ", queueType);
     queue_provider[shop_id][index] = queueType;
   }
+
+
 }
 
 function deleteQueueTypeProvider(shop_id: number, queueType_id: number) {

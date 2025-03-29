@@ -149,3 +149,25 @@ export async function changeShopPassword(request : Request, formData: FormData){
     console.error(e);
   }
 }
+
+export async function fetchingShopItems(shop_id: number, request: Request) {
+  try {
+    const { getCookie } = useAuth;
+    const data = await getCookie({request})
+    const token = data.token;
+
+    const res = await fetch(`${process.env.API_BASE_URL}/shops/${shop_id}/items`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    const response = await res.json();
+    console.log("Response:", response);
+
+    return response.data;
+  } catch (e) {
+    console.error(e);
+  }
+}

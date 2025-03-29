@@ -1,6 +1,5 @@
 import { deleteQueueTypeProvider, queue_provider, setQueueProvider, shop_provider, updateQueueProvider } from "~/provider/provider";
 import { useAuth } from "~/utils/auth";
-import { prefetchImage } from "~/utils/image-proxy";
 
 export interface QueueType {
     id: number;
@@ -50,25 +49,22 @@ export async function fetchingQueuesType(request: Request, shop_id: number) {
 
 export async function createQueueType(request: Request, payload: FormData) {
     try {
-        console.log("Creating queue type");
-        console.log("Payload : ", payload);
         const { getCookie } = useAuth;
         const data = await getCookie({ request });
-        console.log("Cookie : " , data);
         const token = data.token;
-        console.log("Token : ", token);
         const response = await fetch(`${process.env.API_BASE_URL}/queues`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${token}`,
+            "Accept" : "application/json"
           },
           body: payload, 
         });
         const res = await response.json();
-        const image_url = await prefetchImage(res.data.image_url ?? "");
-        res.data.image_url = image_url;
+        
+       
         updateQueueProvider(res.data.shop_id, res.data);
-
+        
 
     } catch (e) {
         console.error("error creating queue type : ", e);
@@ -101,20 +97,23 @@ export async function deleteQueueType(request: Request, queue_id: number, shop_i
 
 export async function updateQueueType(request: Request, queue_id: number, payload: FormData) {
     try {
-        console.log("Updating queue type");
-        console.log("Payload : ", payload);
+
         const { getCookie } = useAuth;
         const cookie = await getCookie({ request });
         const token = cookie.token;
+        console.log("Payload : ", payload);
         const response = await fetch(`${process.env.API_BASE_URL}/queues/${queue_id}`, {
             headers: {
-                "Authorization": `Bearer ${token}`,
-                "Content-Type": "application/json"
+            "Authorization": `Bearer ${token}`,
             },
-            method : "PATCH",
-            body : JSON.stringify(payload)
+            method : "POST",
+            body : payload
         });
+        
         const data = await response.json();
+
+
+
         delete data.data.shop
         const queueTypePayload : QueueType = data.data;
         updateQueueProvider(queueTypePayload.shop_id, queueTypePayload);
@@ -226,8 +225,10 @@ export async function changeQueueStatus(request: Request, queue_id: number, stat
             })
         });
 
-
         const data = await response.json();
+        delete data.data.shop
+        const queueTypePayload : QueueType = data.data;
+        updateQueueProvider(queueTypePayload.shop_id, queueTypePayload);
         return data;
 
     } catch (error) {

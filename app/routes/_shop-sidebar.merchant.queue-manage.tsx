@@ -1,5 +1,5 @@
 import { Plus, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   redirect,
   useFetcher,
@@ -8,6 +8,7 @@ import {
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
 } from "react-router";
+import Swal from "sweetalert2";
 import QueueTypeCard from "~/components/queue-type-card";
 import { queue_provider, shop_provider } from "~/provider/provider";
 import {
