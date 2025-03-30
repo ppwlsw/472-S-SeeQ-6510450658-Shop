@@ -29,4 +29,17 @@ services:
 networks:
   newton:
     external: true
-    name: seeq-backend_sail
+    name: 472-g-seeq-dream-team_sail
+
+volumes:
+   redisinsight:
+    image: redislabs/redisinsight:latest
+    ports:
+      - "5540:5540"
+    environment:
+      - RI_ENCRYPTION_KEY=7Pca9Tcp9IDqJiy6l137HsLW4DDz7Y37tLIhndUzBzw=
+    volumes:
+      - redisinsight:/data
+    restart: always
+    networks:
+      - newton
